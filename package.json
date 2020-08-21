@@ -9,9 +9,11 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@panzoom/panzoom": "^4.3.1",
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
     "quasar": "^1.0.0",
+    "viz.js": "^2.1.2",
     "vue-codemirror": "^4.0.6"
   },
   "devDependencies": {
