@@ -72,54 +72,54 @@
   }
 */
 var gramatica = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,3],$V1=[1,4],$V2=[1,5],$V3=[1,6],$V4=[1,7],$V5=[1,9],$V6=[1,10],$V7=[1,11],$V8=[1,12],$V9=[1,13],$Va=[5,6,7,8,9,10,12],$Vb=[5,6,7,12],$Vc=[5,6,7,8,9,12];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,8],$V1=[1,9],$V2=[1,7],$V3=[5,18,19,24],$V4=[1,19],$V5=[1,20],$V6=[11,28];
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"e":4,"EOF":5,"+":6,"-":7,"*":8,"/":9,"^":10,"(":11,")":12,"NUMBER":13,"E":14,"PI":15,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",6:"+",7:"-",8:"*",9:"/",10:"^",11:"(",12:")",13:"NUMBER",14:"E",15:"PI"},
-productions_: [0,[3,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,3],[4,1],[4,1],[4,1]],
+symbols_: {"error":2,"S":3,"INSTRUCCIONES":4,"EOF":5,"INSTRUCCION":6,"DECLARACION_VARIABLE":7,"CONSOLE_LOG":8,"TIPO_DEC_VARIABLE":9,"id":10,"s_punto_coma":11,"s_igual":12,"EXP":13,"s_dos_puntos":14,"TIPO_VARIABLE_NATIVA":15,"number":16,"cadena":17,"r_let":18,"r_const":19,"r_string":20,"r_number":21,"r_boolean":22,"r_void":23,"r_console":24,"s_punto":25,"r_log":26,"s_par_izq":27,"s_par_der":28,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",10:"id",11:"s_punto_coma",12:"s_igual",14:"s_dos_puntos",16:"number",17:"cadena",18:"r_let",19:"r_const",20:"r_string",21:"r_number",22:"r_boolean",23:"r_void",24:"r_console",25:"s_punto",26:"r_log",27:"s_par_izq",28:"s_par_der"},
+productions_: [0,[3,2],[4,2],[4,1],[6,1],[6,1],[7,3],[7,5],[7,7],[13,1],[13,1],[9,1],[9,1],[15,1],[15,1],[15,1],[15,1],[8,7]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
-return $$[$0-1];
+ return new NodoAST({label: 'S', hijos: [$$[$0-1]], linea: yylineno}); 
 break;
 case 2:
-this.$ = $$[$0-2]+$$[$0];
+  /* this.$ = new NodoAST({label: 'INSTRUCCIONES', hijos:[$$[$0-1], $$[$0]], linea: yylineno}); */  { this.$ = new NodoAST({label: 'INSTRUCCIONES', hijos: [...$$[$0-1].hijos, ...$$[$0].hijos], linea: yylineno}); }  
 break;
 case 3:
-this.$ = $$[$0-2]-$$[$0];
+/*   this.$ = new NodoAST({label: 'INSTRUCCIONES', hijos: [$$[$0]], linea: yylineno}); */    this.$ = $$[$0]; 
 break;
-case 4:
-this.$ = $$[$0-2]*$$[$0];
-break;
-case 5:
-this.$ = $$[$0-2]/$$[$0];
+case 4: case 5:
+ this.$ = new NodoAST({label: 'INSTRUCCION', hijos: [$$[$0]], linea: yylineno}); 
 break;
 case 6:
-this.$ = Math.pow($$[$0-2], $$[$0]);
+ this.$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$$[$0-2], $$[$0-1], $$[$0]], linea: yylineno});  
 break;
 case 7:
-this.$ = -$$[$0];
+ this.$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], linea: yylineno}); 
 break;
 case 8:
-this.$ = $$[$0-1];
+ this.$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$$[$0-6],$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno});
 break;
-case 9:
-this.$ = Number(yytext);
+case 9: case 10:
+ this.$ = new NodoAST({label: 'EXP', hijos: [$$[$0]], linea: yylineno}); 
 break;
-case 10:
-this.$ = Math.E;
+case 11: case 12:
+ this.$ = new NodoAST({label: 'TIPO_DEC_VARIABLE', hijos: [$$[$0]], linea: yylineno}); 
 break;
-case 11:
-this.$ = Math.PI;
+case 13: case 14: case 15: case 16:
+ this.$ = new NodoAST({label: 'TIPO_VARIABLE_NATIVA', hijos: [$$[$0]], linea: yylineno}); 
+break;
+case 17:
+ this.$ = new NodoAST({label: 'CONSOLE_LOG', hijos: [$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], linea: yylineno}); 
 break;
 }
 },
-table: [{3:1,4:2,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{1:[3]},{5:[1,8],6:$V5,7:$V6,8:$V7,9:$V8,10:$V9},{4:14,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{4:15,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},o($Va,[2,9]),o($Va,[2,10]),o($Va,[2,11]),{1:[2,1]},{4:16,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{4:17,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{4:18,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{4:19,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},{4:20,7:$V0,11:$V1,13:$V2,14:$V3,15:$V4},o($Va,[2,7]),{6:$V5,7:$V6,8:$V7,9:$V8,10:$V9,12:[1,21]},o($Vb,[2,2],{8:$V7,9:$V8,10:$V9}),o($Vb,[2,3],{8:$V7,9:$V8,10:$V9}),o($Vc,[2,4],{10:$V9}),o($Vc,[2,5],{10:$V9}),o($Va,[2,6]),o($Va,[2,8])],
-defaultActions: {8:[2,1]},
+table: [{3:1,4:2,6:3,7:4,8:5,9:6,18:$V0,19:$V1,24:$V2},{1:[3]},{5:[1,10],6:11,7:4,8:5,9:6,18:$V0,19:$V1,24:$V2},o($V3,[2,3]),o($V3,[2,4]),o($V3,[2,5]),{10:[1,12]},{25:[1,13]},{10:[2,11]},{10:[2,12]},{1:[2,1]},o($V3,[2,2]),{11:[1,14],12:[1,15],14:[1,16]},{26:[1,17]},o($V3,[2,6]),{13:18,16:$V4,17:$V5},{15:21,20:[1,22],21:[1,23],22:[1,24],23:[1,25]},{27:[1,26]},{11:[1,27]},o($V6,[2,9]),o($V6,[2,10]),{12:[1,28]},{12:[2,13]},{12:[2,14]},{12:[2,15]},{12:[2,16]},{13:29,16:$V4,17:$V5},o($V3,[2,7]),{13:30,16:$V4,17:$V5},{28:[1,31]},{11:[1,32]},{11:[1,33]},o($V3,[2,8]),o($V3,[2,17])],
+defaultActions: {8:[2,11],9:[2,12],10:[2,1],22:[2,13],23:[2,14],24:[2,15],25:[2,16]},
 parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -266,6 +266,8 @@ parse: function parse(input) {
     }
     return true;
 }};
+
+  const { NodoAST } = require('../arbol/nodoAST');
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
@@ -594,34 +596,62 @@ options: {},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:/* skip whitespace */
+case 0:// espacios en blanco
 break;
-case 1:return 13;
+case 1:// comentario simple
 break;
-case 2:return 8;
+case 2:// comentario multiple líneas
 break;
-case 3:return 9;
+case 3:return 20;
 break;
-case 4:return 7;
+case 4:return 21;
 break;
-case 5:return 6;
+case 5:return 22;
 break;
-case 6:return 10;
+case 6:return 23;
 break;
-case 7:return 11;
+case 7:return 'r_type';
 break;
-case 8:return 12;
+case 8:return 18;
 break;
-case 9:return 15;
+case 9:return 19;
 break;
-case 10:return 14;
+case 10:return 24;
 break;
-case 11:return 5;
+case 11:return 26
+break;
+case 12:return 11;
+break;
+case 13:return 's_coma';
+break;
+case 14:return 14;
+break;
+case 15:return 12;
+break;
+case 16:return 's_llave_izq';
+break;
+case 17:return 's_llave_der';
+break;
+case 18:return 27;
+break;
+case 19:return 28;
+break;
+case 20:return 25;
+break;
+case 21: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 17; 
+break;
+case 22:return 16;
+break;
+case 23:return 10;
+break;
+case 24:return 5;
+break;
+case 25: console.error('Este es un error léxico: ' + yy_.yytext + ', en la linea: ' + yy_.yylineno + ', en la columna: ' + yy_.yylloc.first_column); 
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:\*)/,/^(?:\/)/,/^(?:-)/,/^(?:\+)/,/^(?:\^)/,/^(?:\()/,/^(?:\))/,/^(?:PI\b)/,/^(?:E\b)/,/^(?:$)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:\/\/.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:string\b)/,/^(?:number\b)/,/^(?:boolean\b)/,/^(?:void\b)/,/^(?:type\b)/,/^(?:let\b)/,/^(?:const\b)/,/^(?:console\b)/,/^(?:log\b)/,/^(?:;)/,/^(?:,)/,/^(?::)/,/^(?:=)/,/^(?:\{)/,/^(?:\})/,/^(?:\()/,/^(?:\))/,/^(?:\.)/,/^(?:"[^\"]*")/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:([a-zA-Z])[a-zA-Z0-9_]*)/,/^(?:$)/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"inclusive":true}}
 });
 return lexer;
 })();

@@ -11,6 +11,13 @@ import { Module, render } from "viz.js/full.render.js";
 let viz = new Viz({ Module, render });
 
 export default {
+  props: {
+    dot: {
+      type: String,
+      required: true,
+      default: "",
+    },
+  },
   data() {
     return {
       panzoom: null,
@@ -20,52 +27,28 @@ export default {
   beforeDestroy() {
     let item = document.getElementById("panzoom-element");
     item?.removeEventListener("scroll", this.scrollHandler);
-    item?.parentElement?.removeEventListener('wheel', this.panzoom.zoomWithWheel);
+    item?.parentElement?.removeEventListener(
+      "wheel",
+      this.panzoom.zoomWithWheel
+    );
   },
   mounted() {
     let item = document.getElementById("panzoom-element");
     item.addEventListener("scroll", this.scrollHandler);
     this.panzoom = Panzoom(item, {
-      maxScale: 2,
+      maxScale: 1000,
     });
     //Zoom with mouse's wheel
-    item.parentElement.addEventListener('wheel', this.panzoom.zoomWithWheel)
-    const dot = `
-        digraph G {
-
-          subgraph cluster_0 {
-            style=filled;
-            color=lightgrey;
-            node [style=filled,color=white];
-            a0 -> a1 -> a2 -> a3;
-            label = "process #1";
-          }
-
-          subgraph cluster_1 {
-            node [style=filled];
-            b0 -> b1 -> b2 -> b3;
-            label = "process #2";
-            color=blue
-          }
-          start -> a0;
-          start -> b0;
-          a1 -> b3;
-          b2 -> a3;
-          a3 -> a0;
-          a3 -> end;
-          b3 -> end;
-
-          start [shape=Mdiamond];
-          end [shape=Msquare];
-        }
-      `;
+    item.parentElement.addEventListener("wheel", this.panzoom.zoomWithWheel);
     viz
-      .renderString(dot)
+      .renderString(this.dot)
       .then((element) => {
         let codigo = element.substring(
           element.indexOf("<svg"),
           element.lastIndexOf(">") + 1
         );
+        codigo = codigo.replace(/width=\"([0-9]*pt)\"/, 'width="800pt"');
+        codigo = codigo.replace(/height=\"([0-9]*pt)\"/, 'height="500pt"');
         this.grafica = codigo;
       })
       .catch((error) => {
@@ -83,3 +66,4 @@ export default {
   },
 };
 </script>
+

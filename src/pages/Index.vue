@@ -3,12 +3,7 @@
     <div class="row">
       <div class="col-12">
         <q-btn-group push spread>
-          <q-btn
-            push
-            label="Traducir"
-            icon="transform"
-            @click="showNotif('primary','Traduccion realizada con exito')"
-          />
+          <q-btn push label="Traducir" icon="transform" @click="analizar" />
           <q-btn push label="Ejecutar" icon="play_arrow" @click="ejecutar" />
         </q-btn-group>
       </div>
@@ -35,10 +30,11 @@
               With so much content to display at once, and often so little screen real-estate,
               Cards have fast become the design pattern of choice for many companies, including
               the likes of Google and Twitter.
+              {{ codigoTraducido }}
             </q-tab-panel>
 
             <q-tab-panel name="ast" style="height: 500px">
-              <ast />
+              <ast :dot="dot" />
             </q-tab-panel>
           </q-tab-panels>
         </q-card>
@@ -57,7 +53,9 @@ import "codemirror/theme/paraiso-light.css";
 // import language js
 import "codemirror/mode/javascript/javascript.js";
 // Analizador
-import Analizador from "../../analizador/gramatica";
+import Analizador from "../analizador/gramatica";
+//Vuex
+import { mapState, mapMutations } from "vuex";
 
 export default {
   components: {
@@ -66,7 +64,8 @@ export default {
   },
   data() {
     return {
-      code: "const a = 10",
+      code:
+        'let a; \nconst b = 5; \nlet d = "hola mundo"; \nconst var : string = "hola mundo esto es una prueba"; \nconsole.log(5);',
       cmOptions: {
         tabSize: 4,
         matchBrackets: true,
@@ -78,10 +77,13 @@ export default {
       },
       output: "salida de ejemplo",
       tab: "editor",
+      dot: "",
+      contadorDot: 0,
     };
   },
   methods: {
-    showNotif(variant, message) {
+    ...mapMutations("traduccion", ["AGREGAR_CODIGO"]),
+    notificar(variant, message) {
       this.$q.notify({
         message: message,
         color: variant,
@@ -100,13 +102,42 @@ export default {
     },
     analizar() {
       try {
-        this.showNotif("primary", Analizador.parse("5+40/"));
+        const raiz = Analizador.parse(this.code);
+        this.contadorDot = 0;
+        this.dot = "digraph G {";
+        this.generarAstDot(raiz);
+        this.dot += "}";
+        this.notificar("primary", "Operación realizada con éxito");
       } catch (error) {
-        this.showNotif("negative", JSON.stringify(error));
+        this.notificar("negative", JSON.stringify(error));
+      }
+    },
+    generarAstDot(nodo) {
+      if (nodo instanceof Object) {
+        let idPadre = this.contadorDot;
+        this.dot += `node${idPadre}[label="${nodo.label}"];\n`;
+        if (nodo.hasOwnProperty("hijos")) {
+          nodo.hijos.forEach((nodoHijo) => {
+            if (nodoHijo instanceof Object) {
+              let idHijo = ++this.contadorDot;
+              this.dot += `node${idPadre} -> node${idHijo};\n`;
+              this.generarAstDot(nodoHijo);
+            } else {
+              let idHijo = ++this.contadorDot;
+              this.dot += `node${idPadre} -> node${idHijo};\n`;
+              this.dot += `node${idHijo}[label="${nodoHijo}"];`;
+            }
+          });
+        }
       }
     },
     traducir() {},
-    ejecutar() {},
+    ejecutar() {
+
+    },
+  },
+  computed: {
+    ...mapState("traduccion", ["codigoTraducido"]),
   },
 };
 </script>
