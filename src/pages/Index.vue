@@ -30,7 +30,6 @@
               With so much content to display at once, and often so little screen real-estate,
               Cards have fast become the design pattern of choice for many companies, including
               the likes of Google and Twitter.
-              {{ codigoTraducido }}
             </q-tab-panel>
 
             <q-tab-panel name="ast" style="height: 500px">
@@ -53,9 +52,9 @@ import "codemirror/theme/paraiso-light.css";
 // import language js
 import "codemirror/mode/javascript/javascript.js";
 // Analizador
-import Analizador from "../analizador/gramatica";
-//Vuex
-import { mapState, mapMutations } from "vuex";
+import AnalizadorTraduccion from "../analizador/gramatica_traduccion";
+//Traduccion
+import { Traduccion } from '../traduccion/traduccion';
 
 export default {
   components: {
@@ -65,7 +64,9 @@ export default {
   data() {
     return {
       code:
-        'let a; \nconst b = 5; \nlet d = "hola mundo"; \nconst var : string = "hola mundo esto es una prueba"; \nconsole.log(5);',
+        'let a; \nconst b = 5; \nlet d = "hola mundo"; \nconst var : string = "hola mundo esto es una prueba"; \nconsole.log(5); \nconst f : number ;'+
+        '\nconst a = -5 * 70 / 8 + 35 - 20 ; \nconst h = 2 ** 3 ** 4; \nconsole.log(5++); \nconsole.log(!a && c || d);'+
+        '\nfunction prueba() : void { \n\tlet z = 25 + 30; \n\tconsole.log(z); \n\tfunction prueba2(p1:string, p2:number) : string {\n\t\t return z + 5; \n\t} \n}',
       cmOptions: {
         tabSize: 4,
         matchBrackets: true,
@@ -82,7 +83,6 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("traduccion", ["AGREGAR_CODIGO"]),
     notificar(variant, message) {
       this.$q.notify({
         message: message,
@@ -102,43 +102,24 @@ export default {
     },
     analizar() {
       try {
-        const raiz = Analizador.parse(this.code);
-        this.contadorDot = 0;
-        this.dot = "digraph G {";
-        this.generarAstDot(raiz);
-        this.dot += "}";
-        this.notificar("primary", "Operación realizada con éxito");
+        const raizTraduccion = AnalizadorTraduccion.parse(this.code);
+        //Validación de raiz
+        if(raizTraduccion == null){
+          this.notificar("negative", 'No fue posible obtener la raíz de la traducción');
+          return;
+        }
+        let traduccion = new Traduccion(raizTraduccion);
+        this.dot = traduccion.getDot();
+        this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
-      }
-    },
-    generarAstDot(nodo) {
-      if (nodo instanceof Object) {
-        let idPadre = this.contadorDot;
-        this.dot += `node${idPadre}[label="${nodo.label}"];\n`;
-        if (nodo.hasOwnProperty("hijos")) {
-          nodo.hijos.forEach((nodoHijo) => {
-            if (nodoHijo instanceof Object) {
-              let idHijo = ++this.contadorDot;
-              this.dot += `node${idPadre} -> node${idHijo};\n`;
-              this.generarAstDot(nodoHijo);
-            } else {
-              let idHijo = ++this.contadorDot;
-              this.dot += `node${idPadre} -> node${idHijo};\n`;
-              this.dot += `node${idHijo}[label="${nodoHijo}"];`;
-            }
-          });
-        }
       }
     },
     traducir() {},
     ejecutar() {
 
     },
-  },
-  computed: {
-    ...mapState("traduccion", ["codigoTraducido"]),
-  },
+  }
 };
 </script>
 

@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import traduccion from './modules/traduccion'
 
 // import example from './module-example'
 
@@ -18,7 +17,7 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      traduccion
+      //import_name
     },
 
     // enable strict mode (adds overhead!)
