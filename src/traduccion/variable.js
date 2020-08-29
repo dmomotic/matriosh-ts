@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Variable = void 0;
 class Variable {
     constructor({ id, tipo = 4 /* SIN_ASIGNAR */, reasignable = false }) {
-        Object.assign(this, { id, tipo, reasignable, idnuevo: id });
+        Object.assign(this, { id, tipo, reasignable, idnuevo: null });
     }
     getTipo() {
         return this.tipo;
@@ -16,6 +16,9 @@ class Variable {
     }
     setIdNuevo(nuevo) {
         this.idNuevo = nuevo;
+    }
+    getIdNuevo() {
+        return this.idNuevo != null && this.idNuevo.trim() !== '' ? this.idNuevo : this.id;
     }
 }
 exports.Variable = Variable;

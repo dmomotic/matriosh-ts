@@ -55,6 +55,7 @@ import "codemirror/mode/javascript/javascript.js";
 import AnalizadorTraduccion from "../analizador/gramatica_traduccion";
 //Traduccion
 import { Traduccion } from '../traduccion/traduccion';
+import { Variable } from '../traduccion/variable';
 
 export default {
   components: {
@@ -110,6 +111,7 @@ export default {
         }
         let traduccion = new Traduccion(raizTraduccion);
         this.dot = traduccion.getDot();
+        console.log(traduccion.traducir());
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));

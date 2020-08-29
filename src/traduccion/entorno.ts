@@ -5,9 +5,10 @@ export class Entorno {
   padre: Entorno;
   nombre: string;
 
-  constructor(padre : Entorno, nombre : string){
+  constructor(padre? : Entorno, nombre? : string){
     this.padre = padre != null ? padre : null;
     this.nombre = nombre != null ? nombre : null;
+    this.variables = new Map();
   }
 
   generadoPorFuncion() : boolean{
@@ -24,7 +25,7 @@ export class Entorno {
 
   getVariable(id : string) : Variable {
     for(let e : Entorno = this; e != null ; e = e.padre){
-      let variable = e.variables.get('id');
+      let variable = e.variables.get(id);
       if(variable != null) return variable;
     }
     return null;

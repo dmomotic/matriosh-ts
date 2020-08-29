@@ -7,14 +7,14 @@ export class Variable {
   idNuevo: string;
 
   constructor({ id, tipo = TIPOS.SIN_ASIGNAR, reasignable = false }: { id: string, tipo?: TIPOS, reasignable?: boolean }) {
-    Object.assign(this, { id, tipo, reasignable, idnuevo: id });
+    Object.assign(this, { id, tipo, reasignable, idnuevo: null });
   }
 
   getTipo(): TIPOS {
     return this.tipo;
   }
 
-  setTipo(tipo: TIPOS) : void {
+  setTipo(tipo: TIPOS): void {
     this.tipo = tipo;
   }
 
@@ -22,7 +22,11 @@ export class Variable {
     return this.reasignable;
   }
 
-  setIdNuevo(nuevo : string): void{
+  setIdNuevo(nuevo: string): void {
     this.idNuevo = nuevo;
+  }
+
+  getIdNuevo(): string {
+    return this.idNuevo != null && this.idNuevo.trim() !== '' ? this.idNuevo : this.id;
   }
 }

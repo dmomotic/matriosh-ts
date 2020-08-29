@@ -5,6 +5,7 @@ class Entorno {
     constructor(padre, nombre) {
         this.padre = padre != null ? padre : null;
         this.nombre = nombre != null ? nombre : null;
+        this.variables = new Map();
     }
     generadoPorFuncion() {
         return this.nombre != null;
@@ -17,7 +18,7 @@ class Entorno {
     }
     getVariable(id) {
         for (let e = this; e != null; e = e.padre) {
-            let variable = e.variables.get('id');
+            let variable = e.variables.get(id);
             if (variable != null)
                 return variable;
         }

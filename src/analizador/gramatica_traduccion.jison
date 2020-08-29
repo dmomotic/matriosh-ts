@@ -89,10 +89,12 @@
 %%
 
 //Definición de la Grámatica
+
+/*YA*/
 S
   : INSTRUCCIONES EOF { return new NodoAST({label: 'S', hijos: [$1], linea: yylineno}); }
 ;
-
+/*YA*/
 INSTRUCCIONES
   : INSTRUCCIONES INSTRUCCION  { $$ = new NodoAST({label: 'INSTRUCCIONES', hijos: [...$1.hijos, ...$2.hijos], linea: yylineno}); }
   | INSTRUCCION                { $$ = new NodoAST({label: 'INSTRUCCIONES', hijos: [...$1.hijos], linea: yylineno}); }
@@ -106,7 +108,7 @@ INSTRUCCION
 ;
 
 DECLARACION_FUNCION
-  //Funcion sin parametros -> function test() : TIPO { INSTRUCCIONES }
+  //Funcion sin parametros -> function test() : TIPO { INSTRUCCIONES } --> YA <--
   : function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9], linea: yylineno}); }
   //Funcion con parametros -> function test ( LISTA_PARAMETROS ) : TIPO { INSTRUCCIONES }
   | function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10], linea: yylineno}); }
@@ -126,7 +128,7 @@ RETURN
 ;
 
 DECLARACION_VARIABLE
-  //let id ;
+  //let id ;  --> YA <--
   : TIPO_DEC_VARIABLE id punto_coma { $$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$1, $2, $3], linea: yylineno});  }
   //let id : TIPO_VARIABLE_NATIVA ;
   | TIPO_DEC_VARIABLE id dos_puntos TIPO_VARIABLE_NATIVA punto_coma { $$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$1, $2, $3, $4, $5], linea: yylineno}); }
