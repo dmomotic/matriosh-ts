@@ -64,10 +64,7 @@ export default {
   },
   data() {
     return {
-      code:
-        'let a; \nconst b = 5; \nlet d = "hola mundo"; \nconst var : string = "hola mundo esto es una prueba"; \nconsole.log(5); \nconst f : number ;'+
-        '\nconst a = -5 * 70 / 8 + 35 - 20 ; \nconst h = 2 ** 3 ** 4; \nconsole.log(5++); \nconsole.log(!a && c || d);'+
-        '\nfunction prueba() : void { \n\tlet z = 25 + 30; \n\tconsole.log(z); \n\tfunction prueba2(p1:string, p2:number) : string {\n\t\t return z + 5; \n\t} \n}',
+      code: '',
       cmOptions: {
         tabSize: 4,
         matchBrackets: true,

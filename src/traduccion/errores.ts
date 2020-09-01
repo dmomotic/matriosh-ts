@@ -1,3 +1,5 @@
+import { Error } from '../arbol/error';
+
 export class Errores {
   private static instance: Errores;
   lista: Object[];
@@ -13,7 +15,7 @@ export class Errores {
     return Errores.instance;
   }
 
-  public push(error: Object): void {
+  public push(error: Error): void {
     this.lista.push(error);
   }
 }

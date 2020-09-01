@@ -1,6 +1,8 @@
 import { Entorno } from './entorno';
 import { Variable } from './variable';
 import { TIPOS } from './tipos';
+import { Error } from '../arbol/error';
+import { Errores } from './errores';
 
 export class Traduccion {
   raiz: Object;
@@ -68,6 +70,8 @@ export class Traduccion {
         case 3:
           //TIPO_DEC_VARIABLE id punto_coma
           const tipo = this.getValorDeNodo(nodo.hijos[0]);
+          //Si es tipo const es un error ya que debe estar inicializado
+          Errores.getInstance().push(new Error({ tipo: 'semantico', linea: nodo.linea, descripcion: 'Las constantes deben ser declaradas con un valor inicial' }));
           const id = nodo.hijos[1];
           const reasignable = tipo === 'let' ? true : false;
           //Si fue declarada dentro de una funcion
@@ -154,6 +158,7 @@ export class Traduccion {
     if (this.esNodo('EXP', nodo)) {
       switch (nodo.hijos.length) {
         case 1:
+          //number, string, id
           this.recorrer(nodo.hijos[0], e);
           break;
         case 3:
