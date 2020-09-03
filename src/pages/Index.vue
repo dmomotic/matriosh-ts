@@ -108,7 +108,7 @@ export default {
         }
         let traduccion = new Traduccion(raizTraduccion);
         this.dot = traduccion.getDot();
-        console.log(traduccion.traducir());
+        // console.log(traduccion.traducir());
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));

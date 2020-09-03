@@ -2,9 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Traduccion = void 0;
 const entorno_1 = require("./entorno");
-const variable_1 = require("./variable");
-const error_1 = require("../arbol/error");
-const errores_1 = require("./errores");
 class Traduccion {
     constructor(raiz) {
         this.raiz = raiz;
@@ -57,54 +54,54 @@ class Traduccion {
             });
         }
         if (this.esNodo('DECLARACION_VARIABLE', nodo)) {
-            switch (nodo.hijos.length) {
-                case 3:
-                    //TIPO_DEC_VARIABLE id punto_coma
-                    const tipo = this.getValorDeNodo(nodo.hijos[0]);
-                    //Si es tipo const es un error ya que debe estar inicializado
-                    errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: nodo.linea, descripcion: 'Las constantes deben ser declaradas con un valor inicial' }));
-                    const id = nodo.hijos[1];
-                    const reasignable = tipo === 'let' ? true : false;
-                    //Si fue declarada dentro de una funcion
-                    if (e.generadoPorFuncion()) {
-                        const variable = new variable_1.Variable({ id, tipo: 4 /* SIN_ASIGNAR */, reasignable });
-                        variable.setIdNuevo(this.getIdNuevo(e, id));
-                        e.setVariable(variable);
-                        this.codigo += `\n${tipo} ${variable.getIdNuevo()};`;
-                    }
-                    //Si no fue declarada dentro de una funcion
-                    else {
-                        e.setVariable(new variable_1.Variable({ id, tipo: 4 /* SIN_ASIGNAR */, reasignable }));
-                        this.codigo += `\n${tipo} ${id};`;
-                    }
-                    break;
-                case 5:
-                    //TIPO_DEC_VARIABLE id igual EXP punto_coma
-                    if (this.esNodo('TIPO_DEC_VARIABLE', nodo.hijos[0]) && this.esNodo('EXP', nodo.hijos[3])) {
-                        const tipo = this.getValorDeNodo(nodo.hijos[0]);
-                        const id = nodo.hijos[1];
-                        const reasignable = tipo === 'let' ? true : false;
-                        //Si fue declarada dentro de una funcion
-                        if (e.generadoPorFuncion()) {
-                            //TODO: Debo obtener el tipo de la expresion para asignarlo aqui
-                            const variable = new variable_1.Variable({ id, tipo: 4 /* SIN_ASIGNAR */, reasignable });
-                            variable.setIdNuevo(this.getIdNuevo(e, id));
-                            e.setVariable(variable);
-                            this.codigo += `\n${tipo} ${variable.getIdNuevo()} = `;
-                            this.recorrer(nodo.hijos[3], e);
-                            this.codigo += ';';
-                        }
-                        //Si no fue declarada dentro de una funcion
-                        else {
-                            //TODO: Debo obtener el tipo de la expresion para asignarlo aqui
-                            e.setVariable(new variable_1.Variable({ id, tipo: 4 /* SIN_ASIGNAR */, reasignable }));
-                            this.codigo += `\n${tipo} ${id} = `;
-                            this.recorrer(nodo.hijos[3], e);
-                            this.codigo += ';';
-                        }
-                    }
-                    break;
-            }
+            // switch (nodo.hijos.length) {
+            //   case 3:
+            //     //TIPO_DEC_VARIABLE id punto_coma
+            //     const tipo = this.getValorDeNodo(nodo.hijos[0]);
+            //     //Si es tipo const es un error ya que debe estar inicializado
+            //     Errores.getInstance().push(new Error({ tipo: 'semantico', linea: nodo.linea, descripcion: 'Las constantes deben ser declaradas con un valor inicial' }));
+            //     const id = nodo.hijos[1];
+            //     const reasignable = tipo === 'let' ? true : false;
+            //     //Si fue declarada dentro de una funcion
+            //     if (e.generadoPorFuncion()) {
+            //       const variable = new Variable({ id, tipo: TIPOS.SIN_ASIGNAR, reasignable });
+            //       variable.setIdNuevo(this.getIdNuevo(e, id));
+            //       e.setVariable(variable);
+            //       this.codigo += `\n${tipo} ${variable.getIdNuevo()};`;
+            //     }
+            //     //Si no fue declarada dentro de una funcion
+            //     else {
+            //       e.setVariable(new Variable({ id, tipo: TIPOS.SIN_ASIGNAR, reasignable }));
+            //       this.codigo += `\n${tipo} ${id};`;
+            //     }
+            //     break;
+            //   case 5:
+            //     //TIPO_DEC_VARIABLE id igual EXP punto_coma
+            //     if (this.esNodo('TIPO_DEC_VARIABLE', nodo.hijos[0]) && this.esNodo('EXP', nodo.hijos[3])) {
+            //       const tipo = this.getValorDeNodo(nodo.hijos[0]);
+            //       const id = nodo.hijos[1];
+            //       const reasignable = tipo === 'let' ? true : false;
+            //       //Si fue declarada dentro de una funcion
+            //       if (e.generadoPorFuncion()) {
+            //         //TODO: Debo obtener el tipo de la expresion para asignarlo aqui
+            //         const variable = new Variable({ id, tipo: TIPOS.SIN_ASIGNAR, reasignable });
+            //         variable.setIdNuevo(this.getIdNuevo(e, id));
+            //         e.setVariable(variable);
+            //         this.codigo += `\n${tipo} ${variable.getIdNuevo()} = `;
+            //         this.recorrer(nodo.hijos[3], e);
+            //         this.codigo += ';';
+            //       }
+            //       //Si no fue declarada dentro de una funcion
+            //       else {
+            //         //TODO: Debo obtener el tipo de la expresion para asignarlo aqui
+            //         e.setVariable(new Variable({ id, tipo: TIPOS.SIN_ASIGNAR, reasignable }));
+            //         this.codigo += `\n${tipo} ${id} = `;
+            //         this.recorrer(nodo.hijos[3], e);
+            //         this.codigo += ';';
+            //       }
+            //     }
+            //     break;
+            // }
         }
         if (this.esNodo('DECLARACION_FUNCION', nodo)) {
             switch (nodo.hijos.length) {
