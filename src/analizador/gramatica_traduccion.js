@@ -243,7 +243,7 @@ case 76:
  this.$ = new NodoAST({label: 'DECLARACION_VARIABLE', hijos: [$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno});  
 break;
 case 77: case 78: case 79: case 80: case 81: case 82:
- this.$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [...$$[$0-2].hijos,$$[$0-1],$$[$0]], linea: yylineno}); 
+ this.$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [...$$[$0-2].hijos,$$[$0]], linea: yylineno}); 
 break;
 case 83: case 84: case 85: case 86: case 87: case 88:
  this.$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$$[$0]], linea: yylineno}); 

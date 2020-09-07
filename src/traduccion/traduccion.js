@@ -139,7 +139,6 @@ class Traduccion {
                         //{id, exp}
                         if (declaracion['id'] && declaracion['exp'] && !declaracion['tipo'] && !declaracion['corchetes']) {
                             //TODO: ASIGNAR EL TIPO BASADO EN LA EXPRESION
-                            console.log('si trae exp');
                             const tipo = 4 /* SIN_ASIGNAR */;
                             const variable = new variable_1.Variable({ id, tipo, reasignable });
                             //Si estoy en en entorno generado por una funcion
@@ -149,6 +148,20 @@ class Traduccion {
                             e.setVariable(variable);
                             this.codigo += `${variable.getIdNuevo()} = ${declaracion['exp']}`;
                         }
+                        //{id, tipo, exp}
+                        if (declaracion['id'] && declaracion['tipo'] && declaracion['exp'] && !declaracion['corchetes']) {
+                            const tipo = declaracion['tipo'];
+                            //TODO: Validar que el tipo asignado y el tipo de la exp sean iguales
+                            const variable = new variable_1.Variable({ id, tipo: this.getTipo(tipo, e), reasignable });
+                            //Si estoy en en entorno generado por una funcion
+                            if (e.generadoPorFuncion()) {
+                                variable.setIdNuevo(this.getIdNuevo(e, id));
+                            }
+                            e.setVariable(variable);
+                            this.codigo += `${variable.getIdNuevo()} : ${tipo} = ${declaracion['exp']}`;
+                        }
+                        //{id, tipo, corchetes}
+                        //{id, tipo, corchetes, exp}
                         //Si no soy el ultimo agrego una coma
                         if (index < declaraciones.length - 1)
                             this.codigo += ', ';
@@ -165,6 +178,13 @@ class Traduccion {
                 // DEC_ID | DEC_ID_TIPO | DEC_ID_TIPO_CORCHETES | DEC_ID_EXP ...
                 case 1:
                     return [this.recorrer(nodo.hijos[0], e)];
+                default:
+                    const lista = [];
+                    nodo.hijos.forEach((nodoHijo) => {
+                        const declaracion = this.recorrer(nodoHijo, e);
+                        lista.push(declaracion);
+                    });
+                    return lista;
             }
         }
         //DEC_ID
@@ -195,6 +215,40 @@ class Traduccion {
                     return { id, exp };
             }
         }
+        //DEC_ID_TIPO_EXP
+        else if (this.soyNodo('DEC_ID_TIPO_EXP', nodo)) {
+            switch (nodo.hijos.length) {
+                // id dos_puntos TIPO_VARIABLE_NATIVA igual EXP
+                case 5:
+                    const id = nodo.hijos[0];
+                    const tipo = this.recorrer(nodo.hijos[2], e);
+                    const exp = this.recorrer(nodo.hijos[4], e);
+                    return { id, tipo, exp };
+            }
+        }
+        //DEC_ID_TIPO_CORCHETES
+        else if (this.soyNodo('DEC_ID_TIPO_CORCHETES', nodo)) {
+            switch (nodo.hijos.length) {
+                // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+                case 4:
+                    const id = nodo.hijos[0];
+                    const tipo = this.recorrer(nodo.hijos[2], e);
+                    const corchetes = this.recorrer(nodo.hijos[3], e);
+                    return { id, tipo, corchetes };
+            }
+        }
+        //DEC_ID_TIPO_CORCHETES_EXP
+        else if (this.soyNodo('DEC_ID_TIPO_CORCHETES_EXP', nodo)) {
+            switch (nodo.hijos.length) {
+                // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES igual EXP
+                case 6:
+                    const id = nodo.hijos[0];
+                    const tipo = this.recorrer(nodo.hijos[2], e);
+                    const corchetes = this.recorrer(nodo.hijos[3], e);
+                    const exp = this.recorrer(nodo.hijos[5], e);
+                    return { id, tipo, corchetes, exp };
+            }
+        }
         //EXP
         else if (this.soyNodo('EXP', nodo)) {
             switch (nodo.hijos.length) {
@@ -204,6 +258,62 @@ class Traduccion {
                     //EXP mas EXP
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
                         return this.recorrer(nodo.hijos[0], e) + ` + ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP menos EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` - ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP por EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` * ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP div EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` / ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP mod EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` % ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP potencia EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` ** ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //par_izq EXP par_der
+                    if (nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')') {
+                        return '( ' + this.recorrer(nodo.hijos[1], e) + ' )';
+                    }
+                    //EXP mayor EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` > ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP menor EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` < ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP mayor_igual EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` >= ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP menor_igual EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` <= ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP igual_que EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` == ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP dif_que EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '!=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` != ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP and EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` && ` + this.recorrer(nodo.hijos[2], e);
+                    }
+                    //EXP or EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        return this.recorrer(nodo.hijos[0], e) + ` || ` + this.recorrer(nodo.hijos[2], e);
                     }
             }
         }
@@ -231,6 +341,10 @@ class Traduccion {
         //NULL
         else if (this.soyNodo('NULL', nodo)) {
             return nodo.hijos[0];
+        }
+        //LISTA_CORCHETES
+        else if (this.soyNodo('LISTA_CORCHETES', nodo)) {
+            return nodo.hijos[0].repeat(nodo.hijos.length);
         }
         return null;
     }
