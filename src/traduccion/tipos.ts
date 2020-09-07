@@ -1,6 +1,6 @@
 export const enum TIPOS {
   STRING,
-  NUMERIC,
+  NUMBER,
   BOOLEAN,
   TYPE,
   SIN_ASIGNAR,
