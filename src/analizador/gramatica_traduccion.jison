@@ -127,9 +127,9 @@ INSTRUCCION
   : DECLARACION_VARIABLE /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | DECLARACION_FUNCION /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | DECLARACION_TYPE /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | ASIGNACION { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | PUSH_ARREGLO { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | CONSOLE_LOG { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | ASIGNACION /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | PUSH_ARREGLO /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | CONSOLE_LOG /*-->YA<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | INSTRUCCION_IF { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | SWITCH { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | BREAK { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
@@ -185,9 +185,11 @@ ASIGNACION
   : id TIPO_IGUAL EXP punto_coma { $$ = new NodoAST({label: 'ASIGNACION', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 
   // type.accesos = EXP ; || type.accesos[][] = EXP;
+  /*-->YA<--*/
   | id LISTA_ACCESOS_TYPE TIPO_IGUAL EXP punto_coma { $$ = new NodoAST({label: 'ASIGNACION', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 
   //variable[][] = EXP ;
+  /*-->YA<--*/
   | ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma { $$ = new NodoAST({label: 'ASIGNACION', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
 
@@ -241,11 +243,11 @@ INSTRUCCION_IF
   | IF LISTA_ELSE_IF ELSE { $$ = new NodoAST({label: 'INSTRUCCION_IF', hijos: [$1,$2,$3], linea: yylineno}); }
 ;
 
-IF
+IF /*-->YA<--*/
   : if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'IF', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
 ;
 
-ELSE
+ELSE /*-->YA<--*/
   : else llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'ELSE', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
 
@@ -258,9 +260,9 @@ LISTA_ELSE_IF
   | ELSE_IF { $$ = new NodoAST({label: 'LISTA_ELSE_IF', hijos: [$1], linea: yylineno}); }
 ;
 
-PUSH_ARREGLO
+PUSH_ARREGLO /*-->YA<--*/
   : id punto push par_izq EXP par_der punto_coma { $$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
-  | id LISTA_ACCESOS_TYPE punto push par_izq EXP par_der punto_coma{ $$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$1,$2,$3,$4,$5,$6,$8], linea: yylineno}); }
+  | id LISTA_ACCESOS_TYPE punto push par_izq EXP par_der punto_coma{ $$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
 ;
 
 DECLARACION_FUNCION /*-->YA<--*/
@@ -434,7 +436,7 @@ TERNARIO
   : EXP interrogacion EXP dos_puntos EXP { $$ = new NodoAST({label: 'TERNARIO', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
-ACCESO_ARREGLO
+ACCESO_ARREGLO /*-->YA<--*/
   : id LISTA_ACCESOS_ARREGLO { $$ = new NodoAST({label: 'ACCESO_ARREGLO', hijos: [$1, $2], linea: yylineno}); }
 ;
 
@@ -454,7 +456,7 @@ LISTA_ACCESOS_ARREGLO /*-->YA<--*/
   | cor_izq EXP cor_der { $$ = new NodoAST({label: 'LISTA_ACCESOS_ARREGLO', hijos: [$1,$2,$3], linea: yylineno}); }
 ;
 
-LISTA_EXPRESIONES
+LISTA_EXPRESIONES /*-->YA<--*/
   : LISTA_EXPRESIONES coma EXP { $$ = new NodoAST({label: 'LISTA_EXPRESIONES', hijos: [...$1.hijos,$2,$3], linea: yylineno}); }
   | EXP { $$ = new NodoAST({label: 'LISTA_EXPRESIONES', hijos: [$1], linea: yylineno}); }
 ;
@@ -474,6 +476,6 @@ TIPO_VARIABLE_NATIVA
   | id      { $$ = new NodoAST({label: 'TIPO_VARIABLE_NATIVA', hijos: [new NodoAST({label: 'ID', hijos: [$1], linea: yylineno})], linea: yylineno}); }
 ;
 
-CONSOLE_LOG
+CONSOLE_LOG /*-->YA<--*/
   : console punto log par_izq LISTA_EXPRESIONES par_der punto_coma { $$ = new NodoAST({label: 'CONSOLE_LOG', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
 ;

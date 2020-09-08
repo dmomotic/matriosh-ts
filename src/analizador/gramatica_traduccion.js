@@ -198,7 +198,7 @@ case 61:
  this.$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$$[$0-6],$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 62:
- this.$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$$[$0-7],$$[$0-6],$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-2],$$[$0]], linea: yylineno}); 
+ this.$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$$[$0-7],$$[$0-6],$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 63:
  this.$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$$[$0-8], $$[$0-7], $$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], linea: yylineno}); 
