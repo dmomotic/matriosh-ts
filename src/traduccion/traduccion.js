@@ -286,32 +286,132 @@ class Traduccion {
         }
         //INSTRUCCION_IF
         else if (this.soyNodo('INSTRUCCION_IF', nodo)) {
+            let codigoAux = '';
+            nodo.hijos.forEach((nodoHijo) => {
+                if (nodoHijo instanceof Object) {
+                    codigoAux += this.recorrer(nodoHijo, e);
+                }
+            });
+            return codigoAux;
+        }
+        //SWITCH
+        else if (this.soyNodo('SWITCH', nodo)) {
+            //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
+            const exp = this.recorrer(nodo.hijos[2], e);
+            const lista_case = this.recorrer(nodo.hijos[5], e);
+            return `switch(${exp}){\n${lista_case}}`;
+        }
+        //BREAK
+        else if (this.soyNodo('BREAK', nodo)) {
+            //break punto_coma
+            return 'break;';
+        }
+        //RETURN
+        else if (this.soyNodo('RETURN', nodo)) {
             switch (nodo.hijos.length) {
-                //IF
-                case 1:
-                    return this.recorrer(nodo.hijos[0], e);
-                //IF ELSE | IF LISTA_ELSE_IF
+                // return punto_coma
                 case 2:
-                    return this.recorrer(nodo.hijos[0], e) + this.recorrer(nodo.hijos[1], e);
+                    return 'return;';
+                // return EXP punto_coma
+                case 3:
+                    const exp = this.recorrer(nodo.hijos[1], e);
+                    return `return ${exp};`;
             }
+        }
+        //CONTINUE
+        else if (this.soyNodo('CONTINUE', nodo)) {
+            //continue punto_coma
+            return 'continue;';
+        }
+        //WHILE
+        else if (this.soyNodo('WHILE', nodo)) {
+            // while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const exp = this.recorrer(nodo.hijos[2], e);
+            const entorno = new entorno_1.Entorno(e);
+            const instrucciones = this.recorrer(nodo.hijos[5], entorno);
+            return `while(${exp}){\n${instrucciones}}`;
+        }
+        //DO_WHILE
+        else if (this.soyNodo('DO_WHILE', nodo)) {
+            // do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
+            const entorno = new entorno_1.Entorno(e);
+            const instrucciones = this.recorrer(nodo.hijos[2], entorno);
+            const exp = this.recorrer(nodo.hijos[6], e);
+            return `do{\n${instrucciones}}while(${exp});`;
+        }
+        //FOR
+        else if (this.soyNodo('FOR', nodo)) {
+            switch (nodo.hijos.length) {
+                case 10:
+                    //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+                    if (this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])) {
+                    }
+                    //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+                    if (this.soyNodo('ASIGNACION', nodo.hijos[2])) {
+                    }
+            }
+        }
+        //GRAFICAR_TS
+        else if (this.soyNodo('GRAFICAR_TS', nodo)) {
+            //graficar_ts par_izq par_der punto_coma
+            return `graficar_ts();`;
+        }
+        //CASE
+        else if (this.soyNodo('CASE', nodo)) {
+            //case EXP dos_puntos INSTRUCCIONES
+            const entorno = new entorno_1.Entorno(e);
+            const exp = this.recorrer(nodo.hijos[1], entorno);
+            const instrucciones = this.recorrer(nodo.hijos[3], entorno);
+            return `case ${exp}: \n${instrucciones}`;
+        }
+        //DEFAULT
+        else if (this.soyNodo('DEFAULT', nodo)) {
+            // default dos_puntos INSTRUCCIONES
+            const instrucciones = this.recorrer(nodo.hijos[2], new entorno_1.Entorno(e));
+            return `default:\n${instrucciones}`;
+        }
+        //LISTA_CASE
+        else if (this.soyNodo('LISTA_CASE', nodo)) {
+            let codigoAux = '';
+            nodo.hijos.forEach((nodoHijo) => {
+                if (nodoHijo instanceof Object) {
+                    codigoAux += this.recorrer(nodoHijo, e);
+                }
+            });
+            return codigoAux;
         }
         //IF
         else if (this.soyNodo('IF', nodo)) {
             //if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
-            const exp = this.recorrer(nodo.hijos[2], nodo);
+            const exp = this.recorrer(nodo.hijos[2], e);
             const entorno = new entorno_1.Entorno(e);
             const instrucciones = this.recorrer(nodo.hijos[5], entorno);
-            return `if(${exp}){\n${instrucciones}\n}`;
+            return `if(${exp}){\n${instrucciones}}\n`;
         }
         //ELSE
         else if (this.soyNodo('ELSE', nodo)) {
             //else llave_izq INSTRUCCIONES llave_der
             const entorno = new entorno_1.Entorno(e);
             const instrucciones = this.recorrer(nodo.hijos[2], entorno);
-            return `else{\n${instrucciones}\n}`;
+            return `else{\n${instrucciones}}`;
         }
+        //ELSE_IF
+        else if (this.soyNodo('ELSE_IF', nodo)) {
+            //else if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const exp = this.recorrer(nodo.hijos[3], e);
+            const entorno = new entorno_1.Entorno(e);
+            const instrucciones = this.recorrer(nodo.hijos[6], entorno);
+            return `else if(${exp}){\n${instrucciones}}\n`;
+        }
+        //LISTA_ELSE_IF
         else if (this.soyNodo('LISTA_ELSE_IF', nodo)) {
-            /*************************** */
+            let codigoAux = '';
+            nodo.hijos.forEach((nodoHijo) => {
+                if (nodoHijo instanceof Object) {
+                    codigoAux += this.recorrer(nodoHijo, e);
+                }
+            });
+            return codigoAux;
         }
         //ACCESO_ARREGLO
         else if (this.soyNodo('ACCESO_ARREGLO', nodo)) {
