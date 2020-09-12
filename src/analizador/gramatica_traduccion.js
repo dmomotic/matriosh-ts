@@ -297,7 +297,7 @@ case 122:
  this.$ = new NodoAST({label: 'EXP', hijos: [$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 123:
- this.$ = new NodoAST({label: 'EXP', hijos: ['[]'], linea: yylineno}); 
+ this.$ = new NodoAST({label: 'EXP', hijos: [$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 124: case 125: case 126: case 127: case 128: case 129: case 130:
  this.$ = new NodoAST({label: 'EXP', hijos: [$$[$0]], linea: yylineno}); 
@@ -333,7 +333,7 @@ case 141:
  this.$ = new NodoAST({label: 'ACCESO_ARREGLO', hijos: [$$[$0-1], $$[$0]], linea: yylineno}); 
 break;
 case 142:
- this.$ = new NodoAST({label: 'ACCESO_TYPE', hijos: [$$[$0-1], ...$$[$0].hijos], linea: yylineno}); 
+ this.$ = new NodoAST({label: 'ACCESO_TYPE', hijos: [$$[$0-1], $$[$0]], linea: yylineno}); 
 break;
 case 143:
  this.$ = new NodoAST({label: 'LISTA_ACCESOS_TYPE', hijos: [...$$[$0-2].hijos,$$[$0-1],$$[$0]], linea: yylineno}); 
@@ -975,11 +975,11 @@ case 60:return 98;
 break;
 case 61:return 114;
 break;
-case 62: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 100; 
+case 62: yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 100; 
 break;
-case 63: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 100; 
+case 63: yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 100; 
 break;
-case 64: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 100; 
+case 64: yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 100; 
 break;
 case 65:return 99;
 break;

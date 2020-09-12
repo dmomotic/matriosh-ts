@@ -324,7 +324,7 @@ export class Traduccion {
     }
 
     //SWITCH
-    else if(this.soyNodo('SWITCH', nodo)){
+    else if (this.soyNodo('SWITCH', nodo)) {
       //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
       const exp = this.recorrer(nodo.hijos[2], e);
       const lista_case = this.recorrer(nodo.hijos[5], e);
@@ -357,42 +357,108 @@ export class Traduccion {
     }
 
     //WHILE
-    else if(this.soyNodo('WHILE', nodo)){
+    else if (this.soyNodo('WHILE', nodo)) {
       // while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
       const exp = this.recorrer(nodo.hijos[2], e);
       const entorno = new Entorno(e);
-      const instrucciones = this.recorrer(nodo.hijos[5],entorno);
+      const instrucciones = this.recorrer(nodo.hijos[5], entorno);
       return `while(${exp}){\n${instrucciones}}`;
     }
 
     //DO_WHILE
-    else if(this.soyNodo('DO_WHILE', nodo)){
+    else if (this.soyNodo('DO_WHILE', nodo)) {
       // do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
       const entorno = new Entorno(e);
-      const instrucciones = this.recorrer(nodo.hijos[2],entorno);
+      const instrucciones = this.recorrer(nodo.hijos[2], entorno);
       const exp = this.recorrer(nodo.hijos[6], e);
       return `do{\n${instrucciones}}while(${exp});`;
     }
 
     //FOR
-    else if(this.soyNodo('FOR', nodo)){
-      switch(nodo.hijos.length){
+    else if (this.soyNodo('FOR', nodo)) {
+      switch (nodo.hijos.length) {
         case 10:
           //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
-          if(this.soyNodo('DECLARACION_VARIABLE',nodo.hijos[2])){
-
+          if (this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])) {
+            const entorno = new Entorno(e);
+            const dec_var = this.recorrer(nodo.hijos[2], entorno);
+            const exp = this.recorrer(nodo.hijos[3], entorno);
+            const asig_for = this.recorrer(nodo.hijos[5], entorno);
+            const instrucciones = this.recorrer(nodo.hijos[8], new Entorno(entorno));
+            return `for(${dec_var} ${exp}; ${asig_for}){\n${instrucciones}}`;
           }
           //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
-          if(this.soyNodo('ASIGNACION',nodo.hijos[2])){
-
+          if (this.soyNodo('ASIGNACION', nodo.hijos[2])) {
+            const asig = this.recorrer(nodo.hijos[2], e);
+            const exp = this.recorrer(nodo.hijos[3], e);
+            const asig_for = this.recorrer(nodo.hijos[5], e);
+            const instrucciones = this.recorrer(nodo.hijos[8], new Entorno(e));
+            return `for(${asig} ${exp}; ${asig_for}){\n${instrucciones}}`;
           }
       }
     }
 
+    //FOR_OF
+    else if (this.soyNodo('FOR_OF', nodo)) {
+      //for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der
+      const entorno = new Entorno(e);
+      const tipo_dec_var = this.recorrer(nodo.hijos[2], entorno);
+      const id = nodo.hijos[3];
+      const exp = this.recorrer(nodo.hijos[5], entorno);
+      const instrucciones = this.recorrer(nodo.hijos[8], new Entorno(entorno));
+      return `for(${tipo_dec_var} ${id} of ${exp}){\n${instrucciones}}`;
+    }
+
+    //FOR_IN
+    else if (this.soyNodo('FOR_IN', nodo)) {
+      //for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der
+      const entorno = new Entorno(e);
+      const tipo_dec_var = this.recorrer(nodo.hijos[2], entorno);
+      const id = nodo.hijos[3];
+      const exp = this.recorrer(nodo.hijos[5], entorno);
+      const instrucciones = this.recorrer(nodo.hijos[8], new Entorno(entorno));
+      return `for(${tipo_dec_var} ${id} in ${exp}){\n${instrucciones}}`;
+    }
+
     //GRAFICAR_TS
-    else if(this.soyNodo('GRAFICAR_TS', nodo)){
+    else if (this.soyNodo('GRAFICAR_TS', nodo)) {
       //graficar_ts par_izq par_der punto_coma
       return `graficar_ts();`;
+    }
+
+    //LLAMADA_FUNCION
+    else if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
+      switch (nodo.hijos.length) {
+        // id par_izq par_der punto_coma
+        case 4: {
+          const id = nodo.hijos[0];
+          return `${id}();`;
+        }
+        //id par_izq LISTA_EXPRESIONES par_der punto_coma
+        case 5: {
+          const id = nodo.hijos[0];
+          const lista_exp = this.recorrer(nodo.hijos[2], e);
+          return `${id}(${lista_exp});`;
+        }
+      }
+    }
+
+    //ASIGNACION_FOR
+    else if (this.soyNodo('ASIGNACION_FOR', nodo)) {
+      switch (nodo.hijos.length) {
+        //id igual EXP
+        case 3:
+          const id = nodo.hijos[0];
+          const exp = this.recorrer(nodo.hijos[2], e);
+          const variable = e.getVariable(id);
+          if (variable) {
+            return `${variable.getIdNuevo()} = ${exp}`;
+          }
+          return `${id} = ${exp}`;
+        //EXP
+        case 1:
+          return this.recorrer(nodo.hijos[0], e);
+      }
     }
 
     //CASE
@@ -711,6 +777,27 @@ export class Traduccion {
       switch (nodo.hijos.length) {
         case 1:
           return this.recorrer(nodo.hijos[0], e);
+        case 2:
+          //menos EXP
+          if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
+            return '-' + this.recorrer(nodo.hijos[1], e);
+          }
+          //EXP mas_mas
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
+            return this.recorrer(nodo.hijos[0], e) + '++';
+          }
+          //EXP menos_menos
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '--') {
+            return this.recorrer(nodo.hijos[0], e) + nodo.hijos[1];
+          }
+          //cor_izq cor_der
+          if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
+            return '[]';
+          }
+          //not EXP
+          if(nodo.hijos[0] = '!' && this.soyNodo('EXP', nodo.hijos[1])){
+            return '!' + this.recorrer(nodo.hijos[1], e);
+          }
         case 3:
           //EXP mas EXP
           if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
@@ -772,8 +859,128 @@ export class Traduccion {
           if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
             return this.recorrer(nodo.hijos[0], e) + ` || ` + this.recorrer(nodo.hijos[2], e);
           }
+          //cor_izq LISTA_EXPRESIONES cor_der
+          if (nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']') {
+            return '[' + this.recorrer(nodo.hijos[1], e) + ']'
+          }
 
 
+      }
+    }
+
+    //ARRAY_LENGTH
+    else if (this.soyNodo('ARRAY_LENGTH', nodo)) {
+      const id = nodo.hijos[0];
+      const variable = e.getVariable(id);
+      switch (nodo.hijos.length) {
+        // id punto length
+        case 3:
+          if (variable) {
+            return `${variable.getIdNuevo()}.length`;
+          }
+          return `${id}.length`
+        case 4:
+          // id LISTA_ACCESOS_ARREGLO punto length
+          if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+            const lista_accesos_arreglo = this.recorrer(nodo.hijos[1], e);
+            if (variable) {
+              return `${variable}${lista_accesos_arreglo}.length`;
+            }
+            return `${id}${lista_accesos_arreglo}.length`;
+          }
+          // id LISTA_ACCESOS_TYPE punto length
+          if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+            const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
+            if (variable) {
+              return `${variable.getIdNuevo()}${lista_accesos_type}.length`;
+            }
+            return `${id}${lista_accesos_type}.length`;
+          }
+      }
+    }
+
+    //ARRAY_POP
+    else if (this.soyNodo('ARRAY_POP', nodo)) {
+      const id = nodo.hijos[0];
+      const variable = e.getVariable(id);
+      switch (nodo.hijos.length) {
+        // id punto pop par_izq par_der
+        case 5:
+          if (variable) {
+            return `${variable.getIdNuevo()}.pop()`
+          }
+          return `${id}.pop()`;
+        //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
+        case 6:
+          const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
+          if (variable) {
+            return `${variable.getIdNuevo()}${lista_accesos_type}.pop()`;
+          }
+          return `${id}${lista_accesos_type}.pop()`;
+      }
+    }
+
+    //TYPE
+    else if(this.soyNodo('TYPE', nodo)){
+      // llave_izq ATRIBUTOS_TYPE llave_der
+      const atributos_type = this.recorrer(nodo.hijos[1], e);
+      return `{\n${atributos_type}\n}`;
+    }
+
+    //TERNARIO
+    else if(this.soyNodo('TERNARIO', nodo)){
+      //EXP interrogacion EXP dos_puntos EXP
+      const exp1 = this.recorrer(nodo.hijos[0], e);
+      const exp2 = this.recorrer(nodo.hijos[2], e);
+      const exp3 = this.recorrer(nodo.hijos[4], e);
+      return `${exp1} ? ${exp2} : ${exp3}`;
+    }
+
+    //ACCESO_TYPE
+    else if (this.soyNodo('ACCESO_TYPE', nodo)) {
+      // id LISTA_ACCESOS_TYPE
+      const id = nodo.hijos[0];
+      const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
+      const variable = e.getVariable(id);
+      if (variable) {
+        return `${variable.getIdNuevo()}${lista_accesos_type}`;
+      }
+      return `${id}${lista_accesos_type}`;
+    }
+
+    //ATRIBUTO_TYPE
+    else if (this.soyNodo('ATRIBUTO_TYPE', nodo)) {
+      // id dos_puntos EXP
+      const id = nodo.hijos[0];
+      const exp = this.recorrer(nodo.hijos[2], e);
+      return `${id} : ${exp}`;
+    }
+
+    //ATRIBUTOS_TYPE
+    else if (this.soyNodo('ATRIBUTOS_TYPE', nodo)) {
+      //ATRIBUTO_TYPE coma ....
+      let codigoAux = '';
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (nodoHijo instanceof Object) {
+          codigoAux += this.recorrer(nodoHijo, e);
+        } else {
+          codigoAux += `${nodoHijo} `;
+        }
+      });
+      return codigoAux;
+    }
+
+    //LLAMADA_FUNCION_EXP
+    else if (this.soyNodo('LLAMADA_FUNCION_EXP', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        // id par_izq par_der
+        case 3:
+          return `${id}()`;
+        // id par_izq LISTA_EXPRESIONES par_der
+        case 4:
+          const lista_exp = this.recorrer(nodo.hijos[2], e);
+          return `${id}(${lista_exp})`;
       }
     }
 
