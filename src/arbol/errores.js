@@ -14,5 +14,14 @@ class Errores {
     push(error) {
         this.lista.push(error);
     }
+    clear() {
+        this.lista = [];
+    }
+    hasErrors() {
+        return this.lista.length > 0;
+    }
+    getErrors() {
+        return this.lista;
+    }
 }
 exports.Errores = Errores;

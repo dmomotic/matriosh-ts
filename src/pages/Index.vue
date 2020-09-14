@@ -27,9 +27,11 @@
             </q-tab-panel>
 
             <q-tab-panel name="consola" style="height: 400px" class="bg-grey-10 text-white">
-              With so much content to display at once, and often so little screen real-estate,
-              Cards have fast become the design pattern of choice for many companies, including
-              the likes of Google and Twitter.
+              <q-list dark bordered separator>
+                <q-item clickable v-ripple v-for="(item, index) in salida" :key="index">
+                  <q-item-section>{{ item }}</q-item-section>
+                </q-item>
+              </q-list>
             </q-tab-panel>
 
             <q-tab-panel name="ast" style="height: 500px">
@@ -54,8 +56,9 @@ import "codemirror/mode/javascript/javascript.js";
 // Analizador
 import AnalizadorTraduccion from "../analizador/gramatica_traduccion";
 //Traduccion
-import { Traduccion } from '../traduccion/traduccion';
-import { Variable } from '../traduccion/variable';
+import { Traduccion } from "../traduccion/traduccion";
+import { Variable } from "../traduccion/variable";
+import { Ejecucion } from "../ejecucion/ejecucion";
 
 export default {
   components: {
@@ -64,7 +67,7 @@ export default {
   },
   data() {
     return {
-      code: '',
+      code: "",
       cmOptions: {
         tabSize: 4,
         matchBrackets: true,
@@ -78,6 +81,7 @@ export default {
       tab: "editor",
       dot: "",
       contadorDot: 0,
+      salida: [],
     };
   },
   methods: {
@@ -102,8 +106,11 @@ export default {
       try {
         const raizTraduccion = AnalizadorTraduccion.parse(this.code);
         //Validación de raiz
-        if(raizTraduccion == null){
-          this.notificar("negative", 'No fue posible obtener la raíz de la traducción');
+        if (raizTraduccion == null) {
+          this.notificar(
+            "negative",
+            "No fue posible obtener la raíz de la traducción"
+          );
           return;
         }
         let traduccion = new Traduccion(raizTraduccion);
@@ -116,9 +123,27 @@ export default {
     },
     traducir() {},
     ejecutar() {
-
+      try {
+        const raiz = AnalizadorTraduccion.parse(this.code);
+        //Validacion de raiz
+        if (raiz == null) {
+          this.notificar(
+            "negative",
+            "No fue posible obtener la raíz de la ejecución"
+          );
+          return;
+        }
+        let ejecucion = new Ejecucion(raiz);
+        this.dot = ejecucion.getDot();
+        ejecucion.ejecutar();
+        ejecucion.imprimirErrores();
+        this.salida = ejecucion.getSalida();
+        this.notificar("primary", "Ejecución realizada con éxito");
+      } catch (error) {
+        this.notificar("negative", JSON.stringify(error));
+      }
     },
-  }
+  },
 };
 </script>
 

@@ -1,8 +1,6 @@
 import { Entorno } from './entorno';
 import { Variable } from './variable';
 import { TIPOS } from './tipos';
-import { Error } from '../arbol/error';
-import { Errores } from './errores';
 
 export class Traduccion {
   raiz: Object;
@@ -30,7 +28,7 @@ export class Traduccion {
   generacionDot(nodo: any): void {
     if (nodo instanceof Object) {
       let idPadre = this.contador;
-      this.dot += `node${idPadre}[label="${nodo.label}"];\n`;
+      this.dot += `node${idPadre}[label="${this.getStringValue(nodo.label)}"];\n`;
       if (nodo.hasOwnProperty("hijos")) {
         nodo.hijos.forEach((nodoHijo: any) => {
           let idHijo = ++this.contador;
@@ -38,11 +36,18 @@ export class Traduccion {
           if (nodoHijo instanceof Object) {
             this.generacionDot(nodoHijo);
           } else {
-            this.dot += `node${idHijo}[label="${nodoHijo}"];`;
+            this.dot += `node${idHijo}[label="${this.getStringValue(nodoHijo)}"];`;
           }
         });
       }
     }
+  }
+
+  getStringValue(label: string): string{
+    if(label.startsWith("\"") || label.startsWith("'") || label.startsWith("`")){
+      return label.substr(1, label.length - 2);
+    }
+    return label;
   }
 
   traducir(): string {

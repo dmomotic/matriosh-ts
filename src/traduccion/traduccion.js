@@ -22,7 +22,7 @@ class Traduccion {
     generacionDot(nodo) {
         if (nodo instanceof Object) {
             let idPadre = this.contador;
-            this.dot += `node${idPadre}[label="${nodo.label}"];\n`;
+            this.dot += `node${idPadre}[label="${this.getStringValue(nodo.label)}"];\n`;
             if (nodo.hasOwnProperty("hijos")) {
                 nodo.hijos.forEach((nodoHijo) => {
                     let idHijo = ++this.contador;
@@ -31,11 +31,17 @@ class Traduccion {
                         this.generacionDot(nodoHijo);
                     }
                     else {
-                        this.dot += `node${idHijo}[label="${nodoHijo}"];`;
+                        this.dot += `node${idHijo}[label="${this.getStringValue(nodoHijo)}"];`;
                     }
                 });
             }
         }
+    }
+    getStringValue(label) {
+        if (label.startsWith("\"") || label.startsWith("'") || label.startsWith("`")) {
+            return label.substr(1, label.length - 2);
+        }
+        return label;
     }
     traducir() {
         let entorno = new entorno_1.Entorno();
