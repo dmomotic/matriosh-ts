@@ -13,6 +13,8 @@ import { Suma } from './expresiones/aritmeticas/suma';
 import { DecType } from './instrucciones/declaraciones/dec_type';
 import { Type } from './expresiones/type';
 import { Asignacion } from './instrucciones/asignaciones/asignacion';
+import { Arreglo } from './expresiones/arreglo';
+import { AccesoArregloSimple } from './expresiones/acceso_arreglo_simple';
 
 export class Ejecucion {
   raiz: Object;
@@ -222,6 +224,11 @@ export class Ejecucion {
             //Si es un objeto
             if (exp instanceof Object) return exp;
           }
+        case 2:
+          //cor_izq cor_der
+          if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
+            return new Arreglo(nodo.linea);
+          }
         case 3:
           //EXP mas EXP
           if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
@@ -229,6 +236,12 @@ export class Ejecucion {
             const expDer = this.recorrer(nodo.hijos[2]);
             const linea = nodo.linea;
             return new Suma(linea, expIzq, expDer);
+          }
+
+          //cor_izq LISTA_EXPRESIONES cor_der
+          if(nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']'){
+            const lista_expresiones = this.recorrer(nodo.hijos[1]);
+            return new Arreglo(nodo.linea, lista_expresiones);
           }
       }
     }
@@ -267,32 +280,32 @@ export class Ejecucion {
     }
 
     // ATRIBUTO
-    if(this.soyNodo('ATRIBUTO', nodo)){
+    if (this.soyNodo('ATRIBUTO', nodo)) {
       // id dos_puntos TIPO_VARIABLE_NATIVA
       // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
       const id = nodo.hijos[0];
       const tipo = this.recorrer(nodo.hijos[2]) as Object;
-      const atributo = {id, ...tipo};
-      if(nodo.hijos.length == 4 && this.soyNodo('LISTA_CORCHETES',nodo.hijos[3])){
+      const atributo = { id, ...tipo };
+      if (nodo.hijos.length == 4 && this.soyNodo('LISTA_CORCHETES', nodo.hijos[3])) {
         atributo['corchetes'] = this.recorrer(nodo.hijos[3]) as Number;
       }
       return atributo; //{id, tipo, type_generador?, corchetes?}
     }
 
     //LISTA_CORCHETES
-    if(this.soyNodo('LISTA_CORCHETES', nodo)){
+    if (this.soyNodo('LISTA_CORCHETES', nodo)) {
       let size = 0;
-      nodo.hijos.forEach((nodoHijo : any) => {
-        if(nodoHijo == '[]') size++;
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (nodoHijo == '[]') size++;
       });
       return size;
     }
 
     //LISTA_ATRIBUTOS
-    if(this.soyNodo('LISTA_ATRIBUTOS', nodo)){
-      const lista_atributos : Object[] = [];
-      nodo.hijos.forEach((nodoHijo : any) => {
-        if(nodoHijo instanceof Object){
+    if (this.soyNodo('LISTA_ATRIBUTOS', nodo)) {
+      const lista_atributos: Object[] = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (nodoHijo instanceof Object) {
           lista_atributos.push(this.recorrer(nodoHijo));
         }
       });
@@ -300,7 +313,7 @@ export class Ejecucion {
     }
 
     //DECLARACION_TYPE
-    if(this.soyNodo('DECLARACION_TYPE', nodo)){
+    if (this.soyNodo('DECLARACION_TYPE', nodo)) {
       // type id igual llave_izq LISTA_ATRIBUTOS llave_der
       const id = nodo.hijos[1];
       const lista_atributos = this.recorrer(nodo.hijos[4]) as Array<Object>;
@@ -309,13 +322,13 @@ export class Ejecucion {
     }
 
     //LISTA_ACCESOS_ARREGLO
-    if(this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo)){
+    if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo)) {
       //Regreso una lista de EXP donde cada una representa un acceso al arreglo
-      const lista : Instruccion[] = [];
-      nodo.hijos.forEach((nodoHijo : any) => {
-        if(nodoHijo instanceof Object){
+      const lista: Instruccion[] = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (nodoHijo instanceof Object) {
           const exp = this.recorrer(nodoHijo);
-          if(exp instanceof Instruccion){
+          if (exp instanceof Instruccion) {
             lista.push(exp);
           }
         }
@@ -324,16 +337,16 @@ export class Ejecucion {
     }
 
     //LISTA_ACCESOS_TYPE
-    if(this.soyNodo('LISTA_ACCESOS_TYPE', nodo)){
+    if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo)) {
       const lista: Array<Object | String> = [];
-      nodo.hijos.forEach((nodoHijo : any) => {
+      nodo.hijos.forEach((nodoHijo: any) => {
         //Si es un objeto
-        if(nodoHijo instanceof Object){
+        if (nodoHijo instanceof Object) {
           const res = this.recorrer(nodoHijo);
           lista.push(res);
         }
         //Si no es un objeto lo agrego solo si es diferente al punto
-        if(typeof nodoHijo == 'string' && nodoHijo != '.'){
+        if (typeof nodoHijo == 'string' && nodoHijo != '.') {
           lista.push(nodoHijo);
         }
       });
@@ -341,21 +354,21 @@ export class Ejecucion {
     }
 
     //TIPO_IGUAL
-    if(this.soyNodo('TIPO_IGUAL', nodo)){
-      switch(nodo.hijos.length){
+    if (this.soyNodo('TIPO_IGUAL', nodo)) {
+      switch (nodo.hijos.length) {
         case 1:
           return '=';
         case 2:
-          if(nodo.hijos[0] == '+') return '+=';
-          if(nodo.hijos[0] == '-') return '-=';
+          if (nodo.hijos[0] == '+') return '+=';
+          if (nodo.hijos[0] == '-') return '-=';
       }
     }
 
     //ASIGNACION
-    if(this.soyNodo('ASIGNACION', nodo)){
-      switch(nodo.hijos.length){
+    if (this.soyNodo('ASIGNACION', nodo)) {
+      switch (nodo.hijos.length) {
         // id LISTA_ACCESOS_TYPE TIPO_IGUAL EXP punto_coma
-        case 5:{
+        case 5: {
           const id = nodo.hijos[0];
           const lista = this.recorrer(nodo.hijos[1]);
           const tipo_igual = this.recorrer(nodo.hijos[2]);
@@ -371,11 +384,11 @@ export class Ejecucion {
         }
         case 4: {
           //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
-          if(this.soyNodo('ACCESO_ARREGLO', nodo.hijos[0])){
+          if (this.soyNodo('ACCESO_ARREGLO', nodo.hijos[0])) {
 
           }
           //id TIPO_IGUAL EXP punto_coma
-          if(typeof nodo.hijos[0] == 'string'){
+          if (typeof nodo.hijos[0] == 'string') {
             const id = nodo.hijos[0];
             const tipo_igual = this.recorrer(nodo.hijos[1]);
             const exp = this.recorrer(nodo.hijos[2]);
@@ -387,19 +400,19 @@ export class Ejecucion {
     }
 
     //ATRIBUTO_TYPE
-    if(this.soyNodo('ATRIBUTO_TYPE', nodo)){
+    if (this.soyNodo('ATRIBUTO_TYPE', nodo)) {
       //id dos_puntos EXP
       const id = nodo.hijos[0];
       const exp = this.recorrer(nodo.hijos[2]);
-      return {id, exp};
+      return { id, exp };
     }
 
     //ATRIBUTOS_TYPE
-    if(this.soyNodo('ATRIBUTOS_TYPE', nodo)){
+    if (this.soyNodo('ATRIBUTOS_TYPE', nodo)) {
       //ATRIBUTO_TYPE coma ATRIBUTO_TYPE....
       const atributos: Array<Object> = [];
-      nodo.hijos.forEach((nodoHijo : any) => {
-        if(nodoHijo instanceof Object){
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (nodoHijo instanceof Object) {
           const res = this.recorrer(nodoHijo);
           atributos.push(res);
         }
@@ -407,11 +420,31 @@ export class Ejecucion {
       return atributos; //[{id, exp}]
     }
 
-    if(this.soyNodo('TYPE', nodo)){
+    //TYPE
+    if (this.soyNodo('TYPE', nodo)) {
       //llave_izq ATRIBUTOS_TYPE llave_der
       const lista_atributos = this.recorrer(nodo.hijos[1]);
       return new Type(nodo.linea, lista_atributos);
     }
+
+    //ACCESO_ARREGLO
+    if (this.soyNodo('ACCESO_ARREGLO', nodo)){
+      //id LISTA_ACCESOS_ARREGLO
+      const id = nodo.hijos[0];
+      const lista_accesos_arreglo = this.recorrer(nodo.hijos[1]);
+      return new AccesoArregloSimple(nodo.linea, id, lista_accesos_arreglo);
+    }
+
+    //ACCESO_TYPE
+    if(this.soyNodo('ACCESO_TYPE', nodo)){
+      //id LISTA_ACCESOS_TYPE
+      const id = nodo.hijos[0];
+      //[id | [EXP]]
+      const lista_accesos_type = this.recorrer(nodo.hijos[1]);
+
+    }
+
+
 
   }
 

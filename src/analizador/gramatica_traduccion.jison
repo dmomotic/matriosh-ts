@@ -394,9 +394,9 @@ EXP
   | false /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'BOOLEAN', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   | null /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'NULL', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   //Arreglos
-  | cor_izq LISTA_EXPRESIONES cor_der /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2,$3], linea: yylineno}); }
-  | cor_izq cor_der /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2], linea: yylineno}); }
-  | ACCESO_ARREGLO /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | cor_izq LISTA_EXPRESIONES cor_der /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2,$3], linea: yylineno}); }
+  | cor_izq cor_der /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2], linea: yylineno}); }
+  | ACCESO_ARREGLO /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_LENGTH /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_POP /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Types - accesos
@@ -436,7 +436,7 @@ TERNARIO /*-->TR<--*/
   : EXP interrogacion EXP dos_puntos EXP { $$ = new NodoAST({label: 'TERNARIO', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
-ACCESO_ARREGLO /*-->TR<--*/
+ACCESO_ARREGLO /*-->TR - EJ<--*/
   : id LISTA_ACCESOS_ARREGLO { $$ = new NodoAST({label: 'ACCESO_ARREGLO', hijos: [$1, $2], linea: yylineno}); }
 ;
 

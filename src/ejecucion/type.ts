@@ -1,19 +1,33 @@
-import { Entorno } from "./entorno";
 import { Variable } from "./variable";
 
 export class Type{
   id: string;
-  atributos: Entorno;
+  atributos: Map<String, Variable>;
 
-  constructor(id: string, atributos: Entorno){
+  constructor(id: string, atributos: Map<String, Variable>){
     Object.assign(this, {id, atributos});
   }
 
   hasAtributo(id: string){
-    return this.atributos.hasVariable(id);
+    return this.atributos.has(id);
   }
 
   setAtributo(variable : Variable){
-    this.atributos.setVariable(variable);
+    this.atributos.set(variable.id, variable);
+  }
+
+  public toString(): string{
+    let salida = '{';
+    for (let [key, value] of this.atributos) {
+      salida += `${key}: `;
+      if(value instanceof Variable){
+        salida += `${value.valor}, `;
+      }
+      else{
+        salida += `${value}, `;
+      }
+    }
+    salida += '}'
+    return salida;
   }
 }

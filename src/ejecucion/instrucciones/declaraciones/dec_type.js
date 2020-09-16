@@ -49,7 +49,7 @@ class DecType extends instruccion_1.Instruccion {
                 atributos.setVariable(atributo);
             }
         });
-        e.setType(new type_1.Type(this.id, atributos));
+        e.setType(new type_1.Type(this.id, atributos.variables));
     }
 }
 exports.DecType = DecType;

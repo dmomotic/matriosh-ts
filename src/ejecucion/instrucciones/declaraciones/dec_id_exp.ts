@@ -25,10 +25,10 @@ export class DecIdExp extends Instruccion{
 
     //Creacion de variable en el entorno
     const valor = this.exp.ejecutar(e);
+
     const tipo_asignado = getTipo(valor);
     variable = new Variable({reasignable: this.reasignable, id: this.id, tipo_asignado, valor});
     e.setVariable(variable);
-
   }
 
 }

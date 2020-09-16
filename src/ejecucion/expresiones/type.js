@@ -6,6 +6,7 @@ const errores_1 = require("../../arbol/errores");
 const entorno_1 = require("../entorno");
 const instruccion_1 = require("../instruccion");
 const variable_1 = require("../variable");
+const type_1 = require("../type");
 class Type extends instruccion_1.Instruccion {
     constructor(linea, lista_atributos) {
         super(linea);
@@ -31,7 +32,7 @@ class Type extends instruccion_1.Instruccion {
                 entorno.setVariable(variable);
             }
         });
-        return entorno;
+        return new type_1.Type(null, entorno.variables);
     }
 }
 exports.Type = Type;

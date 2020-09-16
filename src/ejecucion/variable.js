@@ -11,6 +11,9 @@ class Variable {
     isType() {
         return this.tipo_asignado == 3 /* TYPE */ && !this.isArray() && this.type_generador != null;
     }
+    hasTipoAsignado() {
+        return this.tipo_asignado != null;
+    }
     isReasignable() {
         return this.reasignable;
     }

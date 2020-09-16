@@ -20,6 +20,10 @@ export class Variable {
     return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
   }
 
+  hasTipoAsignado() : boolean{
+    return this.tipo_asignado != null;
+  }
+
   isReasignable(): boolean {
     return this.reasignable;
   }

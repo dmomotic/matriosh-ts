@@ -54,7 +54,7 @@ export class DecType extends Instruccion{
         atributos.setVariable(atributo);
       }
     });
-    e.setType(new Type(this.id, atributos));
+    e.setType(new Type(this.id, atributos.variables));
   }
 
 }

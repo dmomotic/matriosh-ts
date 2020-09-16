@@ -14,6 +14,8 @@ const suma_1 = require("./expresiones/aritmeticas/suma");
 const dec_type_1 = require("./instrucciones/declaraciones/dec_type");
 const type_1 = require("./expresiones/type");
 const asignacion_1 = require("./instrucciones/asignaciones/asignacion");
+const arreglo_1 = require("./expresiones/arreglo");
+const acceso_arreglo_simple_1 = require("./expresiones/acceso_arreglo_simple");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -200,6 +202,11 @@ class Ejecucion {
                         if (exp instanceof Object)
                             return exp;
                     }
+                case 2:
+                    //cor_izq cor_der
+                    if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
+                        return new arreglo_1.Arreglo(nodo.linea);
+                    }
                 case 3:
                     //EXP mas EXP
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
@@ -207,6 +214,11 @@ class Ejecucion {
                         const expDer = this.recorrer(nodo.hijos[2]);
                         const linea = nodo.linea;
                         return new suma_1.Suma(linea, expIzq, expDer);
+                    }
+                    //cor_izq LISTA_EXPRESIONES cor_der
+                    if (nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']') {
+                        const lista_expresiones = this.recorrer(nodo.hijos[1]);
+                        return new arreglo_1.Arreglo(nodo.linea, lista_expresiones);
                     }
             }
         }
@@ -369,10 +381,25 @@ class Ejecucion {
             });
             return atributos; //[{id, exp}]
         }
+        //TYPE
         if (this.soyNodo('TYPE', nodo)) {
             //llave_izq ATRIBUTOS_TYPE llave_der
             const lista_atributos = this.recorrer(nodo.hijos[1]);
             return new type_1.Type(nodo.linea, lista_atributos);
+        }
+        //ACCESO_ARREGLO
+        if (this.soyNodo('ACCESO_ARREGLO', nodo)) {
+            //id LISTA_ACCESOS_ARREGLO
+            const id = nodo.hijos[0];
+            const lista_accesos_arreglo = this.recorrer(nodo.hijos[1]);
+            return new acceso_arreglo_simple_1.AccesoArregloSimple(nodo.linea, id, lista_accesos_arreglo);
+        }
+        //ACCESO_TYPE
+        if (this.soyNodo('ACCESO_TYPE', nodo)) {
+            //id LISTA_ACCESOS_TYPE
+            const id = nodo.hijos[0];
+            //[id | [EXP]]
+            const lista_accesos_type = this.recorrer(nodo.hijos[1]);
         }
     }
     /**

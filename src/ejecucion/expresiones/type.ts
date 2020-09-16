@@ -3,6 +3,7 @@ import { Errores } from "../../arbol/errores";
 import { Entorno } from "../entorno";
 import { Instruccion } from "../instruccion";
 import { Variable } from "../variable";
+import { Type as InstanciaType } from '../type';
 
 export class Type extends Instruccion{
 
@@ -34,7 +35,7 @@ export class Type extends Instruccion{
         entorno.setVariable(variable);
       }
     });
-    return entorno;
+    return new InstanciaType(null,entorno.variables);
   }
 
 }
