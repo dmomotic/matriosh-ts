@@ -18,6 +18,10 @@ const arreglo_1 = require("./expresiones/arreglo");
 const acceso_arreglo_simple_1 = require("./expresiones/acceso_arreglo_simple");
 const acceso_type_1 = require("./expresiones/acceso_type");
 const asignacion_atributo_type_1 = require("./instrucciones/asignaciones/asignacion_atributo_type");
+const asignacion_arreglo_1 = require("./instrucciones/asignaciones/asignacion_arreglo");
+const declaracion_funcion_1 = require("./instrucciones/declaraciones/declaracion_funcion");
+const llamada_funcion_1 = require("./expresiones/llamada_funcion");
+const return_1 = require("./expresiones/flujo/return");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -347,6 +351,12 @@ class Ejecucion {
                 case 4: {
                     //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
                     if (this.soyNodo('ACCESO_ARREGLO', nodo.hijos[0])) {
+                        const acceso_arreglo_simple = this.recorrer(nodo.hijos[0]);
+                        const tipo_igual = this.recorrer(nodo.hijos[1]);
+                        const exp = this.recorrer(nodo.hijos[2]);
+                        const id = acceso_arreglo_simple.id;
+                        const lista_accesos = acceso_arreglo_simple.lista_accesos;
+                        return new asignacion_arreglo_1.AsignacionArreglo(nodo.linea, id, lista_accesos, tipo_igual, exp);
                     }
                     //id TIPO_IGUAL EXP punto_coma
                     if (typeof nodo.hijos[0] == 'string') {
@@ -397,6 +407,39 @@ class Ejecucion {
             //[id | [EXP]]
             const lista_accesos_type = this.recorrer(nodo.hijos[1]);
             return new acceso_type_1.AccesoType(nodo.linea, id, lista_accesos_type);
+        }
+        //DECLARACION_FUNCION
+        if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
+            switch (nodo.hijos.length) {
+                //function id par_izq par_der llave_izq INSTRUCCIONES llave_der
+                case 7:
+                    {
+                        const id = nodo.hijos[1];
+                        const instrucciones = this.recorrer(nodo.hijos[5]);
+                        return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones);
+                    }
+            }
+        }
+        //LLAMADA_FUNCION
+        if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                //id par_izq par_der punto_coma
+                case 4:
+                    return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id);
+            }
+        }
+        //RETURN
+        if (this.soyNodo('RETURN', nodo)) {
+            switch (nodo.hijos.length) {
+                //return EXP punto_coma
+                case 3:
+                    const exp = this.recorrer(nodo.hijos[1]);
+                    return new return_1.Return(nodo.linea, true, exp);
+                //return punto_coma
+                case 2:
+                    return new return_1.Return(nodo.linea, false);
+            }
         }
     }
     /**

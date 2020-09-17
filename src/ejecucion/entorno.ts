@@ -1,15 +1,18 @@
+import { Funcion } from './funcion';
 import { Type } from './type';
 import { Variable } from './variable';
 
 export class Entorno{
   variables: Map<String, Variable>;
   padre: Entorno;
-  types: Map<String, Type>
+  types: Map<String, Type>;
+  funciones: Map<String, Funcion>;
 
   constructor(padre? : Entorno){
     this.padre = padre != null ? padre : null;
     this.variables = new Map();
     this.types = new Map();
+    this.funciones = new Map();
   }
 
   setVariable(variable : Variable) : void{
@@ -50,5 +53,17 @@ export class Entorno{
 
   setType(type : Type) : void{
     this.types.set(type.id, type);
+  }
+
+  setFuncion(funcion: Funcion){
+    this.funciones.set(funcion.id, funcion);
+  }
+
+  hasFuncion(id: string) : boolean{
+    return this.funciones.has(id);
+  }
+
+  getFuncion(id: string) : Funcion{
+    return this.funciones.get(id);
   }
 }

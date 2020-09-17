@@ -4,6 +4,7 @@ import { Entorno } from "../../entorno";
 import { Instruccion } from "../../instruccion";
 import { getTipo } from "../../tipo";
 import { Variable } from "../../variable";
+import * as _ from 'lodash';
 
 export class DecIdExp extends Instruccion{
   reasignable: boolean;
@@ -24,7 +25,8 @@ export class DecIdExp extends Instruccion{
     }
 
     //Creacion de variable en el entorno
-    const valor = this.exp.ejecutar(e);
+    let valor = this.exp.ejecutar(e);
+    valor = _.cloneDeep(valor);
 
     const tipo_asignado = getTipo(valor);
     variable = new Variable({reasignable: this.reasignable, id: this.id, tipo_asignado, valor});

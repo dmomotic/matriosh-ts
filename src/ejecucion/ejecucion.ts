@@ -17,6 +17,10 @@ import { Arreglo } from './expresiones/arreglo';
 import { AccesoArregloSimple } from './expresiones/acceso_arreglo_simple';
 import { AccesoType } from './expresiones/acceso_type';
 import { AsignacionAtributoType } from './instrucciones/asignaciones/asignacion_atributo_type';
+import { AsignacionArreglo } from './instrucciones/asignaciones/asignacion_arreglo';
+import { DeclaracionFuncion } from './instrucciones/declaraciones/declaracion_funcion';
+import { LlamadaFuncion } from './expresiones/llamada_funcion';
+import { Return } from './expresiones/flujo/return';
 
 export class Ejecucion {
   raiz: Object;
@@ -241,7 +245,7 @@ export class Ejecucion {
           }
 
           //cor_izq LISTA_EXPRESIONES cor_der
-          if(nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']'){
+          if (nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']') {
             const lista_expresiones = this.recorrer(nodo.hijos[1]);
             return new Arreglo(nodo.linea, lista_expresiones);
           }
@@ -376,12 +380,19 @@ export class Ejecucion {
           const tipo_igual = this.recorrer(nodo.hijos[2]);
           const exp = this.recorrer(nodo.hijos[3]);
 
-          return new AsignacionAtributoType(nodo.linea,id,lista_accesos,tipo_igual,exp);
+          return new AsignacionAtributoType(nodo.linea, id, lista_accesos, tipo_igual, exp);
         }
         case 4: {
           //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
           if (this.soyNodo('ACCESO_ARREGLO', nodo.hijos[0])) {
+            const acceso_arreglo_simple: AccesoArregloSimple = this.recorrer(nodo.hijos[0]);
+            const tipo_igual = this.recorrer(nodo.hijos[1]);
+            const exp = this.recorrer(nodo.hijos[2]);
 
+            const id = acceso_arreglo_simple.id;
+            const lista_accesos = acceso_arreglo_simple.lista_accesos;
+
+            return new AsignacionArreglo(nodo.linea, id, lista_accesos, tipo_igual, exp);
           }
           //id TIPO_IGUAL EXP punto_coma
           if (typeof nodo.hijos[0] == 'string') {
@@ -424,7 +435,7 @@ export class Ejecucion {
     }
 
     //ACCESO_ARREGLO
-    if (this.soyNodo('ACCESO_ARREGLO', nodo)){
+    if (this.soyNodo('ACCESO_ARREGLO', nodo)) {
       //id LISTA_ACCESOS_ARREGLO
       const id = nodo.hijos[0];
       const lista_accesos_arreglo = this.recorrer(nodo.hijos[1]);
@@ -432,7 +443,7 @@ export class Ejecucion {
     }
 
     //ACCESO_TYPE
-    if(this.soyNodo('ACCESO_TYPE', nodo)){
+    if (this.soyNodo('ACCESO_TYPE', nodo)) {
       //id LISTA_ACCESOS_TYPE
       const id = nodo.hijos[0];
       //[id | [EXP]]
@@ -440,8 +451,42 @@ export class Ejecucion {
       return new AccesoType(nodo.linea, id, lista_accesos_type);
     }
 
+    //DECLARACION_FUNCION
+    if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
+      switch (nodo.hijos.length) {
+        //function id par_izq par_der llave_izq INSTRUCCIONES llave_der
+        case 7:
+          {
+            const id = nodo.hijos[1];
+            const instrucciones = this.recorrer(nodo.hijos[5]);
+            return new DeclaracionFuncion(nodo.linea, id, instrucciones);
+          }
+      }
+    }
 
+    //LLAMADA_FUNCION
+    if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
+      const id = nodo.hijos[0];
 
+      switch (nodo.hijos.length) {
+        //id par_izq par_der punto_coma
+        case 4:
+          return new LlamadaFuncion(nodo.linea, id);
+      }
+    }
+
+    //RETURN
+    if (this.soyNodo('RETURN', nodo)) {
+      switch (nodo.hijos.length) {
+        //return EXP punto_coma
+        case 3:
+          const exp = this.recorrer(nodo.hijos[1]);
+          return new Return(nodo.linea, true, exp);
+        //return punto_coma
+        case 2:
+          return new Return(nodo.linea, false);
+      }
+    }
   }
 
   /**

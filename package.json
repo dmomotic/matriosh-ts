@@ -17,7 +17,8 @@
     "vue-codemirror": "^4.0.6"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0"
+    "@quasar/app": "^2.0.0",
+    "@types/lodash": "^4.14.161"
   },
   "browserslist": [
     "ie >= 11",

@@ -6,6 +6,7 @@ class Entorno {
         this.padre = padre != null ? padre : null;
         this.variables = new Map();
         this.types = new Map();
+        this.funciones = new Map();
     }
     setVariable(variable) {
         this.variables.set(variable.id, variable);
@@ -42,6 +43,15 @@ class Entorno {
     }
     setType(type) {
         this.types.set(type.id, type);
+    }
+    setFuncion(funcion) {
+        this.funciones.set(funcion.id, funcion);
+    }
+    hasFuncion(id) {
+        return this.funciones.has(id);
+    }
+    getFuncion(id) {
+        return this.funciones.get(id);
     }
 }
 exports.Entorno = Entorno;

@@ -7,6 +7,7 @@ const arreglo_1 = require("../../arreglo");
 const instruccion_1 = require("../../instruccion");
 const type_1 = require("../../type");
 const variable_1 = require("../../variable");
+const _ = require("lodash");
 class AsignacionAtributoType extends instruccion_1.Instruccion {
     constructor(linea, id, lista_accesos, tipo_igual, exp) {
         super(linea);
@@ -78,9 +79,16 @@ class AsignacionAtributoType extends instruccion_1.Instruccion {
                 }
             }
         }
-        const valor_a_asignar = this.exp.ejecutar(e);
+        let valor_a_asignar = this.exp.ejecutar(e);
+        _.cloneDeep(valor_a_asignar);
         if (valor instanceof variable_1.Variable) {
-            valor.valor = valor_a_asignar;
+            if (this.tipo_igual == '=') {
+                valor.valor = valor_a_asignar;
+            }
+            else {
+                const res = this.tipo_igual == '+=' ? valor.getValor() + valor_a_asignar : valor.getValor() - valor_a_asignar;
+                valor.valor = res;
+            }
         }
         else if (valor instanceof arreglo_1.Arreglo) {
             const lista_exps = this.lista_accesos[size - 1];
@@ -99,7 +107,13 @@ class AsignacionAtributoType extends instruccion_1.Instruccion {
                     }
                     //Si soy el ultimo indice
                     if (i == lista_exps.length - 1) {
-                        valor.setValue(index, valor_a_asignar);
+                        if (this.tipo_igual == '=') {
+                            valor.setValue(index, valor_a_asignar);
+                        }
+                        else {
+                            const res = this.tipo_igual == '+=' ? valor.getValue(index) + valor_a_asignar : valor.getValue(index) - valor_a_asignar;
+                            valor.setValue(index, res);
+                        }
                     }
                     else {
                         valor = valor.getValue(index);

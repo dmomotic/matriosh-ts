@@ -5,6 +5,7 @@ import { Entorno } from "../../entorno";
 import { Instruccion } from "../../instruccion";
 import { Type } from "../../type";
 import { Variable } from "../../variable";
+import * as _ from 'lodash';
 
 export class AsignacionAtributoType extends Instruccion {
   linea: string;
@@ -94,9 +95,16 @@ export class AsignacionAtributoType extends Instruccion {
       }
     }
 
-    const valor_a_asignar = this.exp.ejecutar(e);
+    let valor_a_asignar = this.exp.ejecutar(e);
+    _.cloneDeep(valor_a_asignar);
     if (valor instanceof Variable) {
-      valor.valor = valor_a_asignar;
+      if(this.tipo_igual == '='){
+        valor.valor = valor_a_asignar;
+      }
+      else{
+        const res = this.tipo_igual == '+=' ? valor.getValor() + valor_a_asignar : valor.getValor() - valor_a_asignar;
+        valor.valor = res;
+      }
     }
     else if (valor instanceof Arreglo) {
       const lista_exps = this.lista_accesos[size - 1];
@@ -115,7 +123,13 @@ export class AsignacionAtributoType extends Instruccion {
           }
           //Si soy el ultimo indice
           if (i == lista_exps.length - 1) {
-            valor.setValue(index, valor_a_asignar);
+            if(this.tipo_igual == '='){
+              valor.setValue(index, valor_a_asignar);
+            }
+            else{
+              const res = this.tipo_igual == '+=' ? valor.getValue(index) + valor_a_asignar : valor.getValue(index) - valor_a_asignar;
+              valor.setValue(index, res);
+            }
           } else {
             valor = valor.getValue(index);
           }
