@@ -14,11 +14,14 @@ class Arreglo {
     hasIndex(index) {
         return this.isInitialized() && index < this.getSize();
     }
+    setValue(index, value) {
+        this.arreglo[index] = value;
+    }
     getValue(index) {
         return this.arreglo[index];
     }
     toString() {
-        let salida = '';
+        let salida = '[';
         const size = this.arreglo.length;
         this.arreglo.forEach((item, index) => {
             if (item != null)
@@ -28,6 +31,7 @@ class Arreglo {
             if (index != size - 1)
                 salida += ', ';
         });
+        salida += ']';
         return salida;
     }
 }

@@ -15,6 +15,8 @@ import { Type } from './expresiones/type';
 import { Asignacion } from './instrucciones/asignaciones/asignacion';
 import { Arreglo } from './expresiones/arreglo';
 import { AccesoArregloSimple } from './expresiones/acceso_arreglo_simple';
+import { AccesoType } from './expresiones/acceso_type';
+import { AsignacionAtributoType } from './instrucciones/asignaciones/asignacion_atributo_type';
 
 export class Ejecucion {
   raiz: Object;
@@ -370,17 +372,11 @@ export class Ejecucion {
         // id LISTA_ACCESOS_TYPE TIPO_IGUAL EXP punto_coma
         case 5: {
           const id = nodo.hijos[0];
-          const lista = this.recorrer(nodo.hijos[1]);
+          const lista_accesos = this.recorrer(nodo.hijos[1]); //[id | [EXP]]
           const tipo_igual = this.recorrer(nodo.hijos[2]);
           const exp = this.recorrer(nodo.hijos[3]);
 
-          /*******************************************
-           *
-           *
-           * PENDIENTE TERMINAR PORQUE VOY A HACER PRIMERO LA ASIGNACION SIMPLE DEL TYPE
-           *
-           * *****************************************
-           */
+          return new AsignacionAtributoType(nodo.linea,id,lista_accesos,tipo_igual,exp);
         }
         case 4: {
           //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
@@ -441,7 +437,7 @@ export class Ejecucion {
       const id = nodo.hijos[0];
       //[id | [EXP]]
       const lista_accesos_type = this.recorrer(nodo.hijos[1]);
-
+      return new AccesoType(nodo.linea, id, lista_accesos_type);
     }
 
 

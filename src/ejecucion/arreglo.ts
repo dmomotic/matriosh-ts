@@ -17,18 +17,23 @@ export class Arreglo{
     return this.isInitialized() && index < this.getSize();
   }
 
+  setValue(index: number, value: any){
+    this.arreglo[index] = value;
+  }
+
   getValue(index : number){
     return this.arreglo[index];
   }
 
   public toString() : string{
-    let salida = '';
+    let salida = '[';
     const size = this.arreglo.length;
     this.arreglo.forEach((item : any, index : number) => {
       if(item != null) salida+= item.toString();
       else salida += "null";
       if(index != size - 1) salida += ', ';
     })
+    salida += ']'
     return salida;
   }
 

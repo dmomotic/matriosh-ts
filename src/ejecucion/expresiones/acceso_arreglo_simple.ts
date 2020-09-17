@@ -51,6 +51,7 @@ export class AccesoArregloSimple extends Instruccion {
           }
           return res.getValue(index);
         }
+        //TODO: el else creo que es error
       }
       //Si aun no es el ultimo acceso
       else {
@@ -62,6 +63,7 @@ export class AccesoArregloSimple extends Instruccion {
           }
           res = res.getValue(index);
         }
+        //TODO: el else creo que es error
       }
     }
   }

@@ -9,19 +9,28 @@ class Type {
     hasAtributo(id) {
         return this.atributos.has(id);
     }
+    getAtributo(id) {
+        return this.atributos.get(id);
+    }
     setAtributo(variable) {
         this.atributos.set(variable.id, variable);
     }
     toString() {
         let salida = '{';
+        let i = 0;
+        const size = this.atributos.size - 1;
         for (let [key, value] of this.atributos) {
             salida += `${key}: `;
             if (value instanceof variable_1.Variable) {
-                salida += `${value.valor}, `;
+                salida += `${value.valor}`;
             }
             else {
-                salida += `${value}, `;
+                salida += `${value}`;
             }
+            if (i != size) {
+                salida += ', ';
+            }
+            i++;
         }
         salida += '}';
         return salida;

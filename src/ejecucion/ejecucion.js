@@ -16,6 +16,8 @@ const type_1 = require("./expresiones/type");
 const asignacion_1 = require("./instrucciones/asignaciones/asignacion");
 const arreglo_1 = require("./expresiones/arreglo");
 const acceso_arreglo_simple_1 = require("./expresiones/acceso_arreglo_simple");
+const acceso_type_1 = require("./expresiones/acceso_type");
+const asignacion_atributo_type_1 = require("./instrucciones/asignaciones/asignacion_atributo_type");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -337,16 +339,10 @@ class Ejecucion {
                 // id LISTA_ACCESOS_TYPE TIPO_IGUAL EXP punto_coma
                 case 5: {
                     const id = nodo.hijos[0];
-                    const lista = this.recorrer(nodo.hijos[1]);
+                    const lista_accesos = this.recorrer(nodo.hijos[1]); //[id | [EXP]]
                     const tipo_igual = this.recorrer(nodo.hijos[2]);
                     const exp = this.recorrer(nodo.hijos[3]);
-                    /*******************************************
-                     *
-                     *
-                     * PENDIENTE TERMINAR PORQUE VOY A HACER PRIMERO LA ASIGNACION SIMPLE DEL TYPE
-                     *
-                     * *****************************************
-                     */
+                    return new asignacion_atributo_type_1.AsignacionAtributoType(nodo.linea, id, lista_accesos, tipo_igual, exp);
                 }
                 case 4: {
                     //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
@@ -400,6 +396,7 @@ class Ejecucion {
             const id = nodo.hijos[0];
             //[id | [EXP]]
             const lista_accesos_type = this.recorrer(nodo.hijos[1]);
+            return new acceso_type_1.AccesoType(nodo.linea, id, lista_accesos_type);
         }
     }
     /**

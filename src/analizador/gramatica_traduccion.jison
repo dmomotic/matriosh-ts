@@ -181,7 +181,7 @@ FOR_IN /*-->TR<--*/
 
 ASIGNACION /*-->TR<--*/
   //variable = EXP ;
-  /*-->TR<--*/
+  /*-->TR - FALTA <--*/
   : id TIPO_IGUAL EXP punto_coma { $$ = new NodoAST({label: 'ASIGNACION', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 
   // type.accesos = EXP ; || type.accesos[][] = EXP;
@@ -440,7 +440,7 @@ ACCESO_ARREGLO /*-->TR - EJ<--*/
   : id LISTA_ACCESOS_ARREGLO { $$ = new NodoAST({label: 'ACCESO_ARREGLO', hijos: [$1, $2], linea: yylineno}); }
 ;
 
-ACCESO_TYPE /*-->TR<--*/
+ACCESO_TYPE /*-->TR - EJ<--*/
   : id LISTA_ACCESOS_TYPE { $$ = new NodoAST({label: 'ACCESO_TYPE', hijos: [$1, $2], linea: yylineno}); }
 ;
 
