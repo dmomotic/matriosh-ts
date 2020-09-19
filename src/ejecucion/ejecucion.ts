@@ -21,6 +21,12 @@ import { AsignacionArreglo } from './instrucciones/asignaciones/asignacion_arreg
 import { DeclaracionFuncion } from './instrucciones/declaraciones/declaracion_funcion';
 import { LlamadaFuncion } from './expresiones/llamada_funcion';
 import { Return } from './expresiones/flujo/return';
+import { Resta } from './expresiones/aritmeticas/resta';
+import { Multiplicacion } from './expresiones/aritmeticas/multiplicacion';
+import { Division } from './expresiones/aritmeticas/division';
+import { Modular } from './expresiones/aritmeticas/modular';
+import { Potencia } from './expresiones/aritmeticas/potencia';
+import { Mayor } from './expresiones/relacionales/mayor';
 
 export class Ejecucion {
   raiz: Object;
@@ -231,9 +237,19 @@ export class Ejecucion {
             if (exp instanceof Object) return exp;
           }
         case 2:
+          //menos EXP
+          if(nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])){
+            const expIzq = new Nativo(nodo.linea, -1);
+            const expDer = this.recorrer(nodo.hijos[1]);
+            return new Multiplicacion(nodo.linea, expIzq, expDer);
+          }
           //cor_izq cor_der
           if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
             return new Arreglo(nodo.linea);
+          }
+          //EXP mas_mas
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++'){
+            //TODO hacer porque esta yuca :(
           }
         case 3:
           //EXP mas EXP
@@ -242,6 +258,52 @@ export class Ejecucion {
             const expDer = this.recorrer(nodo.hijos[2]);
             const linea = nodo.linea;
             return new Suma(linea, expIzq, expDer);
+          }
+          //EXP menos EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Resta(linea, expIzq, expDer);
+          }
+          //EXP por EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Multiplicacion(linea, expIzq, expDer);
+          }
+          //EXP div EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Division(linea, expIzq, expDer);
+          }
+          //EXP mod EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Modular(linea, expIzq, expDer);
+          }
+          //EXP potencia EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Potencia(linea, expIzq, expDer);
+          }
+          //par_izq EXP par_der
+          if (nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')') {
+            return this.recorrer(nodo.hijos[1]);
+          }
+          //EXP mayor EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Mayor(linea, expIzq, expDer);
           }
 
           //cor_izq LISTA_EXPRESIONES cor_der

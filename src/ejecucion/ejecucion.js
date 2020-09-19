@@ -22,6 +22,12 @@ const asignacion_arreglo_1 = require("./instrucciones/asignaciones/asignacion_ar
 const declaracion_funcion_1 = require("./instrucciones/declaraciones/declaracion_funcion");
 const llamada_funcion_1 = require("./expresiones/llamada_funcion");
 const return_1 = require("./expresiones/flujo/return");
+const resta_1 = require("./expresiones/aritmeticas/resta");
+const multiplicacion_1 = require("./expresiones/aritmeticas/multiplicacion");
+const division_1 = require("./expresiones/aritmeticas/division");
+const modular_1 = require("./expresiones/aritmeticas/modular");
+const potencia_1 = require("./expresiones/aritmeticas/potencia");
+const mayor_1 = require("./expresiones/relacionales/mayor");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -209,9 +215,19 @@ class Ejecucion {
                             return exp;
                     }
                 case 2:
+                    //menos EXP
+                    if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
+                        const expIzq = new nativo_1.Nativo(nodo.linea, -1);
+                        const expDer = this.recorrer(nodo.hijos[1]);
+                        return new multiplicacion_1.Multiplicacion(nodo.linea, expIzq, expDer);
+                    }
                     //cor_izq cor_der
                     if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
                         return new arreglo_1.Arreglo(nodo.linea);
+                    }
+                    //EXP mas_mas
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
+                        //TODO hacer porque esta yuca :(
                     }
                 case 3:
                     //EXP mas EXP
@@ -220,6 +236,52 @@ class Ejecucion {
                         const expDer = this.recorrer(nodo.hijos[2]);
                         const linea = nodo.linea;
                         return new suma_1.Suma(linea, expIzq, expDer);
+                    }
+                    //EXP menos EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new resta_1.Resta(linea, expIzq, expDer);
+                    }
+                    //EXP por EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new multiplicacion_1.Multiplicacion(linea, expIzq, expDer);
+                    }
+                    //EXP div EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new division_1.Division(linea, expIzq, expDer);
+                    }
+                    //EXP mod EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new modular_1.Modular(linea, expIzq, expDer);
+                    }
+                    //EXP potencia EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new potencia_1.Potencia(linea, expIzq, expDer);
+                    }
+                    //par_izq EXP par_der
+                    if (nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')') {
+                        return this.recorrer(nodo.hijos[1]);
+                    }
+                    //EXP mayor EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new mayor_1.Mayor(linea, expIzq, expDer);
                     }
                     //cor_izq LISTA_EXPRESIONES cor_der
                     if (nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']') {

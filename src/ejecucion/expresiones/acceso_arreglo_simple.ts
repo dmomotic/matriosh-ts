@@ -7,7 +7,6 @@ import { getTipo, TIPO_DATO } from "../tipo";
 
 export class AccesoArregloSimple extends Instruccion {
 
-  linea: string;
   id: string;
   lista_accesos: Array<Instruccion>;
 

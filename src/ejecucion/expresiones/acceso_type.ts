@@ -7,7 +7,6 @@ import { Type } from "../type";
 import { Variable } from "../variable";
 
 export class AccesoType extends Instruccion{
-  linea: string;
   id: string;
   lista_accesos: Array<any>;
 

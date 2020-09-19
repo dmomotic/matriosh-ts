@@ -5,7 +5,6 @@ import { Instruccion } from "../instruccion";
 import { Return } from "../return";
 
 export class LlamadaFuncion extends Instruccion{
-  linea: string;
   id: string;
 
   constructor(linea: string, id: string){

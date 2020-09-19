@@ -3,8 +3,6 @@ import { Instruccion } from "../instruccion";
 import { Arreglo as InstanciaArreglo } from '../arreglo';
 
 export class Arreglo extends Instruccion {
-
-  linea: string;
   lista_expresiones: Array<Instruccion>;
 
   constructor(linea : string, lista_expresiones: Array<Instruccion> = null){
