@@ -1,4 +1,6 @@
+import { Arreglo } from './arreglo';
 import { TIPO, TIPO_DATO } from './tipo';
+import { Type } from './type';
 
 export class Variable {
   id: string;
@@ -13,11 +15,13 @@ export class Variable {
   }
 
   isArray(): boolean {
-    return this.dimensiones > 0;
+    // return this.dimensiones > 0;
+    return this.valor instanceof Arreglo;
   }
 
   isType(): boolean {
-    return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
+    // return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
+    return this.valor instanceof Type;
   }
 
   hasTipoAsignado() : boolean{

@@ -43,8 +43,8 @@ export class Traduccion {
     }
   }
 
-  getStringValue(label: string): string{
-    if(label.startsWith("\"") || label.startsWith("'") || label.startsWith("`")){
+  getStringValue(label: string): string {
+    if (label.startsWith("\"") || label.startsWith("'") || label.startsWith("`")) {
       return label.substr(1, label.length - 2);
     }
     return label;
@@ -800,7 +800,7 @@ export class Traduccion {
             return '[]';
           }
           //not EXP
-          if(nodo.hijos[0] = '!' && this.soyNodo('EXP', nodo.hijos[1])){
+          if (nodo.hijos[0] = '!' && this.soyNodo('EXP', nodo.hijos[1])) {
             return '!' + this.recorrer(nodo.hijos[1], e);
           }
         case 3:
@@ -915,25 +915,35 @@ export class Traduccion {
             return `${variable.getIdNuevo()}.pop()`
           }
           return `${id}.pop()`;
-        //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
         case 6:
-          const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
-          if (variable) {
-            return `${variable.getIdNuevo()}${lista_accesos_type}.pop()`;
+          //id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der
+          if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+            const lista_accesos_arreglo = this.recorrer(nodo.hijos[1], e);
+            if (variable) {
+              return `${variable.getIdNuevo()}${lista_accesos_arreglo}.pop()`;
+            }
+            return `${id}${lista_accesos_arreglo}.pop()`;
           }
-          return `${id}${lista_accesos_type}.pop()`;
+          //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
+          if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+            const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
+            if (variable) {
+              return `${variable.getIdNuevo()}${lista_accesos_type}.pop()`;
+            }
+            return `${id}${lista_accesos_type}.pop()`;
+          }
       }
     }
 
     //TYPE
-    else if(this.soyNodo('TYPE', nodo)){
+    else if (this.soyNodo('TYPE', nodo)) {
       // llave_izq ATRIBUTOS_TYPE llave_der
       const atributos_type = this.recorrer(nodo.hijos[1], e);
       return `{\n${atributos_type}\n}`;
     }
 
     //TERNARIO
-    else if(this.soyNodo('TERNARIO', nodo)){
+    else if (this.soyNodo('TERNARIO', nodo)) {
       //EXP interrogacion EXP dos_puntos EXP
       const exp1 = this.recorrer(nodo.hijos[0], e);
       const exp2 = this.recorrer(nodo.hijos[2], e);

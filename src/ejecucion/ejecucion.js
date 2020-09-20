@@ -28,6 +28,20 @@ const division_1 = require("./expresiones/aritmeticas/division");
 const modular_1 = require("./expresiones/aritmeticas/modular");
 const potencia_1 = require("./expresiones/aritmeticas/potencia");
 const mayor_1 = require("./expresiones/relacionales/mayor");
+const menor_1 = require("./expresiones/relacionales/menor");
+const mayor_igual_1 = require("./expresiones/relacionales/mayor_igual");
+const menor_igual_1 = require("./expresiones/relacionales/menor_igual");
+const igual_1 = require("./expresiones/relacionales/igual");
+const diferente_1 = require("./expresiones/relacionales/diferente");
+const And_1 = require("./expresiones/logicas/And");
+const Or_1 = require("./expresiones/logicas/Or");
+const Not_1 = require("./expresiones/logicas/Not");
+const array_length_simple_1 = require("./expresiones/length/array_length_simple");
+const array_length_accesos_arreglo_1 = require("./expresiones/length/array_length_accesos_arreglo");
+const array_length_accesos_type_1 = require("./expresiones/length/array_length_accesos_type");
+const array_pop_1 = require("./expresiones/pop/array_pop");
+const array_pop_accesos_arreglo_1 = require("./expresiones/pop/array_pop_accesos_arreglo");
+const array_pop_accesos_type_1 = require("./expresiones/pop/array_pop_accesos_type");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -229,6 +243,11 @@ class Ejecucion {
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
                         //TODO hacer porque esta yuca :(
                     }
+                    //not EXP
+                    if (nodo.hijos[0] == '!' && this.soyNodo('EXP', nodo.hijos[1])) {
+                        const exp = this.recorrer(nodo.hijos[1]);
+                        return new Not_1.Not(nodo.linea, exp);
+                    }
                 case 3:
                     //EXP mas EXP
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
@@ -282,6 +301,55 @@ class Ejecucion {
                         const expDer = this.recorrer(nodo.hijos[2]);
                         const linea = nodo.linea;
                         return new mayor_1.Mayor(linea, expIzq, expDer);
+                    }
+                    //EXP menor EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new menor_1.Menor(linea, expIzq, expDer);
+                    }
+                    //EXP mayor_igual EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new mayor_igual_1.MayorIgual(linea, expIzq, expDer);
+                    }
+                    //EXP menor_igual EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new menor_igual_1.MenorIgual(linea, expIzq, expDer);
+                    }
+                    //EXP igual_que EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new igual_1.Igual(linea, expIzq, expDer);
+                    }
+                    //EXP dif_que EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '!=' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new diferente_1.Diferente(linea, expIzq, expDer);
+                    }
+                    //EXP and EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new And_1.And(linea, expIzq, expDer);
+                    }
+                    //EXP or EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const expIzq = this.recorrer(nodo.hijos[0]);
+                        const expDer = this.recorrer(nodo.hijos[2]);
+                        const linea = nodo.linea;
+                        return new Or_1.Or(linea, expIzq, expDer);
                     }
                     //cor_izq LISTA_EXPRESIONES cor_der
                     if (nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']') {
@@ -347,7 +415,7 @@ class Ejecucion {
                     lista_atributos.push(this.recorrer(nodoHijo));
                 }
             });
-            return lista_atributos; //{id, tipo, type_generador?, corchetes?}
+            return lista_atributos; //[{id, tipo, type_generador?, corchetes?}]
         }
         //DECLARACION_TYPE
         if (this.soyNodo('DECLARACION_TYPE', nodo)) {
@@ -502,6 +570,60 @@ class Ejecucion {
                 case 2:
                     return new return_1.Return(nodo.linea, false);
             }
+        }
+        //ARRAY_LENGTH
+        if (this.soyNodo('ARRAY_LENGTH', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                //id punto length
+                case 3:
+                    return new array_length_simple_1.ArrayLengthSimple(nodo.linea, id);
+                case 4:
+                    //id LISTA_ACCESOS_ARREGLO punto length
+                    if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+                        const lista_accesos = this.recorrer(nodo.hijos[1]);
+                        return new array_length_accesos_arreglo_1.ArrayLengthAccesosArreglo(nodo.linea, id, lista_accesos);
+                    }
+                    //id LISTA_ACCESOS_TYPE punto length
+                    if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+                        //[id | [EXP]]
+                        const lista_accesos = this.recorrer(nodo.hijos[1]);
+                        return new array_length_accesos_type_1.ArrayLengthAccesosType(nodo.linea, id, lista_accesos);
+                    }
+            }
+        }
+        //ARRAY_POP
+        if (this.soyNodo('ARRAY_POP', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                //id punto pop par_izq par_der
+                case 5:
+                    return new array_pop_1.ArrayPop(nodo.linea, id);
+                case 6:
+                    //id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der
+                    if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+                        const lista_accesos = this.recorrer(nodo.hijos[1]);
+                        return new array_pop_accesos_arreglo_1.ArrayPopAccesosArreglo(nodo.linea, id, lista_accesos);
+                    }
+                    //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
+                    if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+                        const lista_accesos = this.recorrer(nodo.hijos[1]);
+                        return new array_pop_accesos_type_1.ArrayPopAccesosType(nodo.linea, id, lista_accesos);
+                    }
+            }
+        }
+        //DECLARACION_TYPE
+        if (this.soyNodo('DECLARACION_TYPE', nodo)) {
+            //type id igual llave_izq LISTA_ATRIBUTOS llave_der
+            /******************
+             *
+             *
+             *
+             * continuar aqui
+             *
+             *
+             *************/
+            //[{id, tipo, type_generador?, corchetes?}]
         }
     }
     /**

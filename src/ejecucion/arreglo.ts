@@ -37,6 +37,7 @@ export class Arreglo{
     return salida;
   }
 
-
-
+  pop() : any{
+    return this.arreglo.pop();
+  }
 }

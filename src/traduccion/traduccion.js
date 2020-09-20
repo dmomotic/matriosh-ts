@@ -847,13 +847,23 @@ class Traduccion {
                         return `${variable.getIdNuevo()}.pop()`;
                     }
                     return `${id}.pop()`;
-                //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
                 case 6:
-                    const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
-                    if (variable) {
-                        return `${variable.getIdNuevo()}${lista_accesos_type}.pop()`;
+                    //id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der
+                    if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+                        const lista_accesos_arreglo = this.recorrer(nodo.hijos[1], e);
+                        if (variable) {
+                            return `${variable.getIdNuevo()}${lista_accesos_arreglo}.pop()`;
+                        }
+                        return `${id}${lista_accesos_arreglo}.pop()`;
                     }
-                    return `${id}${lista_accesos_type}.pop()`;
+                    //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
+                    if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+                        const lista_accesos_type = this.recorrer(nodo.hijos[1], e);
+                        if (variable) {
+                            return `${variable.getIdNuevo()}${lista_accesos_type}.pop()`;
+                        }
+                        return `${id}${lista_accesos_type}.pop()`;
+                    }
             }
         }
         //TYPE

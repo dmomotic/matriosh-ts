@@ -3,7 +3,7 @@ import { Errores } from "../../../arbol/errores";
 import { Entorno } from "../../entorno";
 import { Instruccion } from "../../instruccion";
 
-export class Mayor extends Instruccion{
+export class Igual extends Instruccion{
   expIzq: Instruccion;
   expDer: Instruccion;
 
@@ -18,11 +18,11 @@ export class Mayor extends Instruccion{
 
     //Validacion de errores
     if(exp1 == null || exp2 == null){
-      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion mayor que con un operador null`}));
+      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion igual que con un operador null`}));
       return;
     }
 
-    return exp1 > exp2;
+    return exp1 == exp2;
 
     //Solo se pueden realizar operacion mayor que con numbers y strings
     // if((typeof exp1 == 'number' || typeof exp1 == 'string') && (typeof exp2 == 'number' || typeof exp2 == 'string')){

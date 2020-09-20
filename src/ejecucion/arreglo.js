@@ -34,5 +34,8 @@ class Arreglo {
         salida += ']';
         return salida;
     }
+    pop() {
+        return this.arreglo.pop();
+    }
 }
 exports.Arreglo = Arreglo;

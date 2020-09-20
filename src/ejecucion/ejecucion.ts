@@ -27,6 +27,20 @@ import { Division } from './expresiones/aritmeticas/division';
 import { Modular } from './expresiones/aritmeticas/modular';
 import { Potencia } from './expresiones/aritmeticas/potencia';
 import { Mayor } from './expresiones/relacionales/mayor';
+import { Menor } from './expresiones/relacionales/menor';
+import { MayorIgual } from './expresiones/relacionales/mayor_igual';
+import { MenorIgual } from './expresiones/relacionales/menor_igual';
+import { Igual } from './expresiones/relacionales/igual';
+import { Diferente } from './expresiones/relacionales/diferente';
+import { And } from './expresiones/logicas/And';
+import { Or } from './expresiones/logicas/Or';
+import { Not } from './expresiones/logicas/Not';
+import { ArrayLengthSimple } from './expresiones/length/array_length_simple';
+import { ArrayLengthAccesosArreglo } from './expresiones/length/array_length_accesos_arreglo';
+import { ArrayLengthAccesosType } from './expresiones/length/array_length_accesos_type';
+import { ArrayPop } from './expresiones/pop/array_pop';
+import { ArrayPopAccesosArreglo } from './expresiones/pop/array_pop_accesos_arreglo';
+import { ArrayPopAccesosType } from './expresiones/pop/array_pop_accesos_type';
 
 export class Ejecucion {
   raiz: Object;
@@ -238,7 +252,7 @@ export class Ejecucion {
           }
         case 2:
           //menos EXP
-          if(nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])){
+          if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
             const expIzq = new Nativo(nodo.linea, -1);
             const expDer = this.recorrer(nodo.hijos[1]);
             return new Multiplicacion(nodo.linea, expIzq, expDer);
@@ -248,8 +262,13 @@ export class Ejecucion {
             return new Arreglo(nodo.linea);
           }
           //EXP mas_mas
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++'){
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
             //TODO hacer porque esta yuca :(
+          }
+          //not EXP
+          if (nodo.hijos[0] == '!' && this.soyNodo('EXP', nodo.hijos[1])) {
+            const exp = this.recorrer(nodo.hijos[1]);
+            return new Not(nodo.linea, exp);
           }
         case 3:
           //EXP mas EXP
@@ -304,6 +323,55 @@ export class Ejecucion {
             const expDer = this.recorrer(nodo.hijos[2]);
             const linea = nodo.linea;
             return new Mayor(linea, expIzq, expDer);
+          }
+          //EXP menor EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Menor(linea, expIzq, expDer);
+          }
+          //EXP mayor_igual EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new MayorIgual(linea, expIzq, expDer);
+          }
+          //EXP menor_igual EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new MenorIgual(linea, expIzq, expDer);
+          }
+          //EXP igual_que EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Igual(linea, expIzq, expDer);
+          }
+          //EXP dif_que EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '!=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Diferente(linea, expIzq, expDer);
+          }
+          //EXP and EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new And(linea, expIzq, expDer);
+          }
+          //EXP or EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const expIzq = this.recorrer(nodo.hijos[0]);
+            const expDer = this.recorrer(nodo.hijos[2]);
+            const linea = nodo.linea;
+            return new Or(linea, expIzq, expDer);
           }
 
           //cor_izq LISTA_EXPRESIONES cor_der
@@ -377,7 +445,7 @@ export class Ejecucion {
           lista_atributos.push(this.recorrer(nodoHijo));
         }
       });
-      return lista_atributos; //{id, tipo, type_generador?, corchetes?}
+      return lista_atributos; //[{id, tipo, type_generador?, corchetes?}]
     }
 
     //DECLARACION_TYPE
@@ -548,6 +616,64 @@ export class Ejecucion {
         case 2:
           return new Return(nodo.linea, false);
       }
+    }
+
+    //ARRAY_LENGTH
+    if (this.soyNodo('ARRAY_LENGTH', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        //id punto length
+        case 3:
+          return new ArrayLengthSimple(nodo.linea, id);
+        case 4:
+          //id LISTA_ACCESOS_ARREGLO punto length
+          if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+            const lista_accesos = this.recorrer(nodo.hijos[1]);
+            return new ArrayLengthAccesosArreglo(nodo.linea, id, lista_accesos);
+          }
+          //id LISTA_ACCESOS_TYPE punto length
+          if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+            //[id | [EXP]]
+            const lista_accesos = this.recorrer(nodo.hijos[1]);
+            return new ArrayLengthAccesosType(nodo.linea, id, lista_accesos);
+          }
+      }
+    }
+
+    //ARRAY_POP
+    if (this.soyNodo('ARRAY_POP', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        //id punto pop par_izq par_der
+        case 5:
+          return new ArrayPop(nodo.linea, id);
+        case 6:
+          //id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der
+          if (this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo.hijos[1])) {
+            const lista_accesos = this.recorrer(nodo.hijos[1]);
+            return new ArrayPopAccesosArreglo(nodo.linea, id, lista_accesos);
+          }
+          //id LISTA_ACCESOS_TYPE punto pop par_izq par_der
+          if (this.soyNodo('LISTA_ACCESOS_TYPE', nodo.hijos[1])) {
+            const lista_accesos = this.recorrer(nodo.hijos[1]);
+            return new ArrayPopAccesosType(nodo.linea, id, lista_accesos);
+          }
+      }
+    }
+
+    //DECLARACION_TYPE
+    if(this.soyNodo('DECLARACION_TYPE', nodo)){
+      //type id igual llave_izq LISTA_ATRIBUTOS llave_der
+
+      /******************
+       *
+       *
+       *
+       * continuar aqui
+       *
+       *
+       *************/
+      //[{id, tipo, type_generador?, corchetes?}]
     }
   }
 

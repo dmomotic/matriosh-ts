@@ -1,6 +1,7 @@
 import { Salida } from "../../arbol/salida";
 import { Entorno } from "../entorno";
 import { Instruccion } from "../instruccion";
+import * as _ from 'lodash';
 
 export class Log extends Instruccion{
 
@@ -13,7 +14,8 @@ export class Log extends Instruccion{
 
   ejecutar(e: Entorno) {
     this.instrucciones.forEach(inst => {
-      const res = inst.ejecutar(e);
+      let res = inst.ejecutar(e);
+      res = _.cloneDeep(res);
       Salida.getInstance().push(res);
     });
   }

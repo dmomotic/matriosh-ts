@@ -19,5 +19,10 @@
     "prefix": "nna",
     "body": ["{ $$ = new NodoAST({label: '$1', hijos: [$0], linea: yylineno}); }"],
     "description": "Nuevo nodo del arbol en Jison"
-  }
+  },
+  "New Error": {
+    "prefix": "ne",
+    "body": ["Errores.getInstance().push(new Error({tipo: '$1', linea: this.linea, descripcion: `$0`}));"],
+    "description": "Agregar error nuevo"
+  },
 }
