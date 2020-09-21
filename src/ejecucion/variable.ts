@@ -16,12 +16,12 @@ export class Variable {
 
   isArray(): boolean {
     // return this.dimensiones > 0;
-    return this.valor instanceof Arreglo;
+    return this.tipo_asignado == TIPO_DATO.ARRAY || this.valor instanceof Arreglo;
   }
 
   isType(): boolean {
     // return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
-    return this.valor instanceof Type;
+    return this.tipo_asignado == TIPO_DATO.TYPE || this.valor instanceof Type;
   }
 
   hasTipoAsignado() : boolean{

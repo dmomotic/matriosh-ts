@@ -37,5 +37,8 @@ class Arreglo {
     pop() {
         return this.arreglo.pop();
     }
+    push(valor) {
+        this.arreglo.push(valor);
+    }
 }
 exports.Arreglo = Arreglo;

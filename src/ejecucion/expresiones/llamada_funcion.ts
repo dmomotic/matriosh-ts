@@ -25,6 +25,7 @@ export class LlamadaFuncion extends Instruccion{
     const entorno = new Entorno(e);
     for(let instruccion of instrucciones){
       const resp = instruccion.ejecutar(entorno);
+      //Validacion instruccion Return
       if(resp instanceof Return){
         //Si no tiene un valor de retorno solo paro la funcion
         if(!resp.hasValue()) return;

@@ -16,7 +16,8 @@ export class Log extends Instruccion{
     this.instrucciones.forEach(inst => {
       let res = inst.ejecutar(e);
       res = _.cloneDeep(res);
-      Salida.getInstance().push(res);
+      const salida = res ?? 'null';
+      Salida.getInstance().push(salida);
     });
   }
 

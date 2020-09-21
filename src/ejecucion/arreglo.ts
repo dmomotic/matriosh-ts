@@ -40,4 +40,8 @@ export class Arreglo{
   pop() : any{
     return this.arreglo.pop();
   }
+
+  push(valor: any) : void{
+    this.arreglo.push(valor);
+  }
 }

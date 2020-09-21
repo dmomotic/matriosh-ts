@@ -13,7 +13,8 @@ class Log extends instruccion_1.Instruccion {
         this.instrucciones.forEach(inst => {
             let res = inst.ejecutar(e);
             res = _.cloneDeep(res);
-            salida_1.Salida.getInstance().push(res);
+            const salida = res !== null && res !== void 0 ? res : 'null';
+            salida_1.Salida.getInstance().push(salida);
         });
     }
 }

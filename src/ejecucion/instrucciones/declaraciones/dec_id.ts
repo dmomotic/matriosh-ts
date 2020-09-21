@@ -23,6 +23,7 @@ export class DecId extends Instruccion{
     //Si es const es un error ya que todo const debe tener un valor asignado
     if(!this.reasignable){
       Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Se debe asignar un valor a la variable ${this.id} de tipo const`}));
+      return;
     }
     //Registro la variable en mi entorno
     variable = new Variable({reasignable: this.reasignable, id: this.id});

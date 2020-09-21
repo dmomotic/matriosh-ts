@@ -1,26 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArrayPopAccesosType = void 0;
+exports.PushArregloAccesoType = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
 const arreglo_1 = require("../../arreglo");
 const instruccion_1 = require("../../instruccion");
 const type_1 = require("../../type");
-class ArrayPopAccesosType extends instruccion_1.Instruccion {
-    constructor(linea, id, lista_accesos) {
+class PushArregloAccesoType extends instruccion_1.Instruccion {
+    constructor(linea, id, lista_accesos, exp) {
         super(linea);
-        Object.assign(this, { id, lista_accesos });
+        Object.assign(this, { id, lista_accesos, exp });
     }
     ejecutar(e) {
-        //Busqueda y validaciones de variable
+        //Validacion de variable existente
         const variable = e.getVariable(this.id);
         if (!variable) {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se encontro la variable ${this.id}` }));
             return;
         }
-        //Si no es un type
+        //Validacion de type
         if (!variable.isType()) {
-            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La variable ${this.id} no es de tipo Type` }));
+            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La varaible ${this.id} no es de tipo Type` }));
             return;
         }
         let actual = variable.getValor();
@@ -53,7 +53,7 @@ class ArrayPopAccesosType extends instruccion_1.Instruccion {
                     }
                     //Validacion de arreglo
                     if (!(actual instanceof arreglo_1.Arreglo)) {
-                        errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar pop() en un arreglo` }));
+                        errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar push() en un arreglo` }));
                         return;
                     }
                     //Arreglo debe tener el indice
@@ -65,11 +65,14 @@ class ArrayPopAccesosType extends instruccion_1.Instruccion {
                 }
             }
         }
+        //Valido que el valor actual obtenido, sea un Arreglo para poder realizar el push
         if (!(actual instanceof arreglo_1.Arreglo)) {
-            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar pop() en un arreglo verificar: ${this.id}` }));
+            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar push() en un arreglo verificar: ${this.id}` }));
             return;
         }
-        return actual.pop();
+        //Insertamos el dato
+        const valor = this.exp.ejecutar(e);
+        actual.push(valor);
     }
 }
-exports.ArrayPopAccesosType = ArrayPopAccesosType;
+exports.PushArregloAccesoType = PushArregloAccesoType;

@@ -26,8 +26,8 @@
               <codemirror v-model="code" :options="cmOptions" />
             </q-tab-panel>
 
-            <q-tab-panel name="consola" style="height: 400px" class="bg-grey-10 text-white">
-              <q-list dark bordered separator>
+            <q-tab-panel name="consola" class="bg-grey-10 text-white">
+              <q-list dark bordered separator dense>
                 <q-item clickable v-ripple v-for="(item, index) in salida" :key="index">
                   <q-item-section>{{ item }}</q-item-section>
                 </q-item>

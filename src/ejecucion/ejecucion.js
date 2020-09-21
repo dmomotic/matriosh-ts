@@ -42,6 +42,19 @@ const array_length_accesos_type_1 = require("./expresiones/length/array_length_a
 const array_pop_1 = require("./expresiones/pop/array_pop");
 const array_pop_accesos_arreglo_1 = require("./expresiones/pop/array_pop_accesos_arreglo");
 const array_pop_accesos_type_1 = require("./expresiones/pop/array_pop_accesos_type");
+const dec_id_tipo_1 = require("./instrucciones/declaraciones/dec_id_tipo");
+const _ = require("lodash");
+const dec_id_tipo_corchetes_1 = require("./instrucciones/declaraciones/dec_id_tipo_corchetes");
+const dec_id_tipo_exp_1 = require("./instrucciones/declaraciones/dec_id_tipo_exp");
+const dec_id_tipo_corchetes_exp_1 = require("./instrucciones/declaraciones/dec_id_tipo_corchetes_exp");
+const push_arreglo_1 = require("./instrucciones/push/push_arreglo");
+const push_arreglo_acceso_type_1 = require("./instrucciones/push/push_arreglo_acceso_type");
+const break_1 = require("./expresiones/flujo/break");
+const continue_1 = require("./expresiones/flujo/continue");
+const if_1 = require("./if");
+const instruccion_if_1 = require("./expresiones/condicionales/instruccion_if");
+const while_1 = require("./instrucciones/ciclos/while");
+const do_while_1 = require("./instrucciones/ciclos/do_while");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -133,20 +146,45 @@ class Ejecucion {
             const lista_declaraciones = this.recorrer(nodo.hijos[1]);
             const lista_instrucciones = [];
             lista_declaraciones.forEach((item) => {
-                const keys = Object.keys(item);
+                var _a, _b, _c, _d;
                 const linea = nodo.linea;
                 const id = item['id'];
-                //{id}
-                if (keys.length == 1) {
-                    lista_instrucciones.push(new dec_id_1.DecId(linea, reasignable, id));
+                //{id, tipo, dimensiones, exp, type_generador? }
+                if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'dimensiones') && _.has(item, 'exp')) {
+                    const tipo = item['tipo'];
+                    const dimensiones = item['dimensiones'];
+                    const exp = item['exp'];
+                    const type_generador = (_a = item['type_generador']) !== null && _a !== void 0 ? _a : null;
+                    lista_instrucciones.push(new dec_id_tipo_corchetes_exp_1.DecIdTipoCorchetesExp(nodo.linea, reasignable, id, tipo, dimensiones, exp, type_generador));
+                }
+                //{id, tipo, dimensiones, type_generador? }
+                else if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'dimensiones')) {
+                    const tipo = item['tipo'];
+                    const dimensiones = item['dimensiones'];
+                    const type_generador = (_b = item['type_generador']) !== null && _b !== void 0 ? _b : null;
+                    lista_instrucciones.push(new dec_id_tipo_corchetes_1.DecIdTipoCorchetes(nodo.linea, reasignable, id, tipo, dimensiones, type_generador));
+                }
+                //{id, tipo, exp, type_generador?}
+                else if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'exp')) {
+                    const tipo = item['tipo'];
+                    const exp = item['exp'];
+                    const type_generador = (_c = item['type_generador']) !== null && _c !== void 0 ? _c : null;
+                    lista_instrucciones.push(new dec_id_tipo_exp_1.DecIdTipoExp(nodo.linea, reasignable, id, tipo, exp, type_generador));
+                }
+                //{id, tipo, type_generador?}
+                else if (_.has(item, 'id') && _.has(item, 'tipo')) {
+                    const tipo = item['tipo'];
+                    const type_generador = (_d = item['type_generador']) !== null && _d !== void 0 ? _d : null;
+                    lista_instrucciones.push(new dec_id_tipo_1.DecIdTipo(nodo.linea, reasignable, id, tipo, type_generador));
                 }
                 //{id, exp}
-                else if (keys.length == 2) {
+                else if (_.has(item, 'id') && _.has(item, 'exp')) {
                     const exp = item['exp'];
                     lista_instrucciones.push(new dec_id_exp_1.DecIdExp(linea, reasignable, id, exp));
                 }
-                //{id, tipo, type_generador?}
-                else if (keys.length == 3) {
+                //{id}
+                else if (_.has(item, 'id')) {
+                    lista_instrucciones.push(new dec_id_1.DecId(linea, reasignable, id));
                 }
             });
             return lista_instrucciones;
@@ -182,12 +220,37 @@ class Ejecucion {
             const tipo_var_nat = this.recorrer(nodo.hijos[2]);
             return Object.assign({ id: nodo.hijos[0] }, tipo_var_nat);
         }
+        //DEC_ID_TIPO_EXP
+        if (this.soyNodo('DEC_ID_TIPO_EXP', nodo)) {
+            //id dos_puntos TIPO_VARIABLE_NATIVA igual EXP
+            const tipo_var_nat = this.recorrer(nodo.hijos[2]);
+            const exp = this.recorrer(nodo.hijos[4]);
+            return Object.assign(Object.assign({ id: nodo.hijos[0] }, tipo_var_nat), { exp });
+        }
         //DEC_ID_EXP
         if (this.soyNodo('DEC_ID_EXP', nodo)) {
             //id igual EXP
             const id = nodo.hijos[0];
             const exp = this.recorrer(nodo.hijos[2]);
             return { id, exp };
+        }
+        //DEC_ID_TIPO_CORCHETES
+        if (this.soyNodo('DEC_ID_TIPO_CORCHETES', nodo)) {
+            //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+            const id = nodo.hijos[0];
+            const tipo_var_nat = this.recorrer(nodo.hijos[2]);
+            const dimensiones = this.recorrer(nodo.hijos[3]);
+            return Object.assign(Object.assign({ id }, tipo_var_nat), { dimensiones });
+            //{id, tipo, dimensiones, type_generador? }
+        }
+        //DEC_ID_TIPO_CORCHETES_EXP
+        if (this.soyNodo('DEC_ID_TIPO_CORCHETES_EXP', nodo)) {
+            //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES igual EXP
+            const id = nodo.hijos[0];
+            const tipo_var_nat = this.recorrer(nodo.hijos[2]);
+            const dimensiones = this.recorrer(nodo.hijos[3]);
+            const exp = this.recorrer(nodo.hijos[5]);
+            return Object.assign(Object.assign({ id }, tipo_var_nat), { dimensiones, exp });
         }
         //TIPO_DEC_VARIABLE
         if (this.soyNodo('TIPO_DEC_VARIABLE', nodo)) {
@@ -612,18 +675,106 @@ class Ejecucion {
                     }
             }
         }
-        //DECLARACION_TYPE
-        if (this.soyNodo('DECLARACION_TYPE', nodo)) {
-            //type id igual llave_izq LISTA_ATRIBUTOS llave_der
-            /******************
-             *
-             *
-             *
-             * continuar aqui
-             *
-             *
-             *************/
-            //[{id, tipo, type_generador?, corchetes?}]
+        //PUSH_ARREGLO
+        if (this.soyNodo('PUSH_ARREGLO', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                // id punto push par_izq EXP par_der punto_coma
+                case 7: {
+                    const exp = this.recorrer(nodo.hijos[4]);
+                    return new push_arreglo_1.PushArreglo(nodo.linea, id, exp);
+                }
+                // id LISTA_ACCESOS_TYPE punto push par_izq EXP par_der punto_coma
+                case 8: {
+                    const lista_accesos = this.recorrer(nodo.hijos[1]);
+                    const exp = this.recorrer(nodo.hijos[5]);
+                    return new push_arreglo_acceso_type_1.PushArregloAccesoType(nodo.linea, id, lista_accesos, exp);
+                }
+            }
+        }
+        //BREAK
+        if (this.soyNodo('BREAK', nodo)) {
+            //break punto_coma
+            return new break_1.Break(nodo.linea);
+        }
+        //CONTINUE
+        if (this.soyNodo('CONTINUE', nodo)) {
+            //continue punto_coma
+            return new continue_1.Continue(nodo.linea);
+        }
+        //INSTRUCCION_IF
+        if (this.soyNodo('INSTRUCCION_IF', nodo)) {
+            switch (nodo.hijos.length) {
+                //IF
+                case 1:
+                    const inst = this.recorrer(nodo.hijos[0]);
+                    return new instruccion_if_1.InstruccionIf(nodo.linea, [inst]);
+                case 2:
+                    //IF ELSE
+                    if (this.soyNodo('IF', nodo.hijos[0] && this.soyNodo('ELSE', nodo.hijos[1]))) {
+                        const inst_if = this.recorrer(nodo.hijos[0]);
+                        const inst_else = this.recorrer(nodo.hijos[1]);
+                        return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, inst_else]);
+                    }
+                    //IF LISTA_ELSE_IF
+                    if (this.soyNodo('IF', nodo.hijos[0] && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1]))) {
+                        const inst_if = this.recorrer(nodo.hijos[0]);
+                        const lista_ifs = this.recorrer(nodo.hijos[1]);
+                        return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, ...lista_ifs]);
+                    }
+                //IF LISTA_ELSE_IF ELSE
+                case 3:
+                    const inst_if = this.recorrer(nodo.hijos[0]);
+                    const lista_ifs = this.recorrer(nodo.hijos[1]);
+                    const inst_else = this.recorrer(nodo.hijos[2]);
+                    return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, ...lista_ifs, inst_else]);
+            }
+        }
+        //IF
+        if (this.soyNodo('IF', nodo)) {
+            //if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[2]);
+            const instrucciones = this.recorrer(nodo.hijos[5]);
+            return new if_1.If(condicion, instrucciones);
+        }
+        //ELSE
+        if (this.soyNodo('ELSE', nodo)) {
+            //else llave_izq INSTRUCCIONES llave_der
+            const condicion = new nativo_1.Nativo(nodo.linea, true);
+            const instrucciones = this.recorrer(nodo.hijos[2]);
+            return new if_1.If(condicion, instrucciones);
+        }
+        //ELSE_IF
+        if (this.soyNodo('ELSE_IF', nodo)) {
+            //else if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[3]);
+            const instrucciones = this.recorrer(nodo.hijos[6]);
+            return new if_1.If(condicion, instrucciones);
+        }
+        //LISTA_ELSE_IF
+        if (this.soyNodo('LISTA_ELSE_IF', nodo)) {
+            const lista = [];
+            nodo.hijos.forEach((nodoHijo) => {
+                const resp = this.recorrer(nodoHijo);
+                if (resp instanceof if_1.If) {
+                    lista.push(resp);
+                }
+            });
+            return lista;
+        }
+        //WHILE
+        if (this.soyNodo('WHILE', nodo)) {
+            //while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[2]);
+            const instrucciones = this.recorrer(nodo.hijos[5]);
+            return new while_1.While(nodo.linea, condicion, instrucciones);
+        }
+        //DO_WHILE
+        if (this.soyNodo('DO_WHILE', nodo)) {
+            //do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
+            const instrucciones = this.recorrer(nodo.hijos[2]);
+            const condicion = this.recorrer(nodo.hijos[6]);
+            return new do_while_1.DoWhile(nodo.linea, instrucciones, condicion);
         }
     }
     /**

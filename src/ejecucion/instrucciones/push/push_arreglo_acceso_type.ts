@@ -5,25 +5,26 @@ import { Entorno } from "../../entorno";
 import { Instruccion } from "../../instruccion";
 import { Type } from "../../type";
 
-export class ArrayPopAccesosType extends Instruccion {
+export class PushArregloAccesoType extends Instruccion {
   id: string;
   lista_accesos: Array<String | Array<Instruccion>>;
+  exp: Instruccion;
 
-  constructor(linea: string, id: string, lista_accesos: Array<String | Array<Instruccion>>) {
+  constructor(linea: string, id: string, lista_accesos: Array<String | Array<Instruccion>>, exp: Instruccion) {
     super(linea);
-    Object.assign(this, { id, lista_accesos });
+    Object.assign(this, { id, lista_accesos, exp });
   }
 
   ejecutar(e: Entorno) {
-    //Busqueda y validaciones de variable
+    //Validacion de variable existente
     const variable = e.getVariable(this.id);
     if (!variable) {
       Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se encontro la variable ${this.id}` }));
       return;
     }
-    //Si no es un type
+    //Validacion de type
     if (!variable.isType()) {
-      Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `La variable ${this.id} no es de tipo Type` }));
+      Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `La varaible ${this.id} no es de tipo Type` }));
       return;
     }
 
@@ -57,7 +58,7 @@ export class ArrayPopAccesosType extends Instruccion {
           }
           //Validacion de arreglo
           if (!(actual instanceof Arreglo)) {
-            Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar pop() en un arreglo` }));
+            Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar push() en un arreglo` }));
             return;
           }
           //Arreglo debe tener el indice
@@ -69,12 +70,15 @@ export class ArrayPopAccesosType extends Instruccion {
         }
       }
     }
+
+    //Valido que el valor actual obtenido, sea un Arreglo para poder realizar el push
     if(!(actual instanceof Arreglo)){
-      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar pop() en un arreglo verificar: ${this.id}`}));
+      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Solo se puede ejecutar push() en un arreglo verificar: ${this.id}`}));
       return;
     }
 
-    return actual.pop();
+    //Insertamos el dato
+    const valor = this.exp.ejecutar(e);
+    actual.push(valor);
   }
-
 }

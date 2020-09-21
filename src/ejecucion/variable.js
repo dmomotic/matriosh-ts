@@ -9,11 +9,11 @@ class Variable {
     }
     isArray() {
         // return this.dimensiones > 0;
-        return this.valor instanceof arreglo_1.Arreglo;
+        return this.tipo_asignado == 4 /* ARRAY */ || this.valor instanceof arreglo_1.Arreglo;
     }
     isType() {
         // return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
-        return this.valor instanceof type_1.Type;
+        return this.tipo_asignado == 3 /* TYPE */ || this.valor instanceof type_1.Type;
     }
     hasTipoAsignado() {
         return this.tipo_asignado != null;
