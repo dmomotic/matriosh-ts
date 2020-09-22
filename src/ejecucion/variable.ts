@@ -24,6 +24,10 @@ export class Variable {
     return this.tipo_asignado == TIPO_DATO.TYPE || this.valor instanceof Type;
   }
 
+  isNumber(): boolean{
+    return this.tipo_asignado == TIPO_DATO.NUMBER || typeof this.valor == 'number';
+  }
+
   hasTipoAsignado() : boolean{
     return this.tipo_asignado != null;
   }

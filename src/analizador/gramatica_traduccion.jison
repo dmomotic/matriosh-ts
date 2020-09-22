@@ -137,9 +137,9 @@ INSTRUCCION
   | CONTINUE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | WHILE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | DO_WHILE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | FOR /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | FOR_OF /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | FOR_IN /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | FOR /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | FOR_OF /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | FOR_IN /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | GRAFICAR_TS /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | LLAMADA_FUNCION /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
 ;
@@ -166,16 +166,16 @@ DO_WHILE /*-->TR - EJ<--*/
   : do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma { $$ = new NodoAST({label: 'DO_WHILE', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9], linea: yylineno}); }
 ;
 
-FOR /*-->TR<--*/
+FOR /*-->TR - EJ<--*/
   : for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
   | for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
 ;
 
-FOR_OF /*-->TR<--*/
+FOR_OF /*-->TR - EJ<--*/
   : for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR_OF', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
 ;
 
-FOR_IN /*-->TR<--*/
+FOR_IN /*-->TR - EJ<--*/
   : for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR_IN', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
 ;
 
@@ -199,9 +199,10 @@ TIPO_IGUAL /*-->TR - EJ<--*/
   | menos igual { $$ = new NodoAST({label: 'TIPO_IGUAL', hijos: [$1,$2], linea: yylineno}); }
 ;
 
-ASIGNACION_FOR /*-->TR<--*/
-  : id igual EXP { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2,$3], linea: yylineno}); }
-  | EXP { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1], linea: yylineno}); }
+ASIGNACION_FOR /*-->TR - EJ<--*/
+  : id TIPO_IGUAL EXP { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2,$3], linea: yylineno}); }
+  | id mas_mas { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2], linea: yylineno}); }
+  | id menos_menos { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2], linea: yylineno}); }
 ;
 
 SWITCH /*-->TR<--*/
@@ -372,8 +373,8 @@ EXP
   | EXP div EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP mod EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP potencia EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP mas_mas /*-->TR--------------<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
-  | EXP menos_menos /*-->TR----------<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
+  | id mas_mas /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
+  | id menos_menos /*-->TR- EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   | par_izq EXP par_der /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   //Operaciones de Comparacion
   | EXP mayor EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }

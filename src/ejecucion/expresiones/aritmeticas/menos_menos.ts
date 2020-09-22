@@ -3,7 +3,7 @@ import { Errores } from "../../../arbol/errores";
 import { Entorno } from "../../entorno";
 import { Instruccion } from "../../instruccion";
 
-export class MasMas extends Instruccion{
+export class MenosMenos extends Instruccion{
 
   id: string;
 
@@ -23,7 +23,7 @@ export class MasMas extends Instruccion{
     const valor = variable.getValor();
     //Si no es un numero es error
     if(!variable.isNumber()){
-      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede aplicar el operador ++ en la variable ${this.id} porque no es de tipo numerico`}));
+      Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede aplicar el operador -- en la variable ${this.id} porque no es de tipo numerico`}));
       return;
     }
     //Si el valor no esta definido
@@ -32,7 +32,7 @@ export class MasMas extends Instruccion{
       return;
     }
 
-    variable.valor = valor + 1;
+    variable.valor = valor - 1;
     return valor;
   }
 

@@ -411,19 +411,20 @@ class Traduccion {
         }
         //ASIGNACION_FOR
         else if (this.soyNodo('ASIGNACION_FOR', nodo)) {
+            const id = nodo.hijos[0];
             switch (nodo.hijos.length) {
-                //id igual EXP
+                //id mas_mas | id menos_menos
+                case 2:
+                    return `${id}${nodo.hijos[1]}`;
+                //id TIPO_IGUAL EXP
                 case 3:
-                    const id = nodo.hijos[0];
+                    const igual = this.recorrer(nodo.hijos[1], e);
                     const exp = this.recorrer(nodo.hijos[2], e);
                     const variable = e.getVariable(id);
                     if (variable) {
-                        return `${variable.getIdNuevo()} = ${exp}`;
+                        return `${variable.getIdNuevo()} ${igual} ${exp}`;
                     }
                     return `${id} = ${exp}`;
-                //EXP
-                case 1:
-                    return this.recorrer(nodo.hijos[0], e);
             }
         }
         //CASE
@@ -723,13 +724,13 @@ class Traduccion {
                     if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
                         return '-' + this.recorrer(nodo.hijos[1], e);
                     }
-                    //EXP mas_mas
-                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
-                        return this.recorrer(nodo.hijos[0], e) + '++';
+                    //id mas_mas
+                    if (nodo.hijos[1] == '++') {
+                        return nodo.hijos[0] + '++';
                     }
-                    //EXP menos_menos
-                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '--') {
-                        return this.recorrer(nodo.hijos[0], e) + nodo.hijos[1];
+                    //id menos_menos
+                    if (nodo.hijos[1] == '--') {
+                        return nodo.hijos[0] + '--';
                     }
                     //cor_izq cor_der
                     if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {

@@ -15,6 +15,9 @@ class Variable {
         // return this.tipo_asignado == TIPO_DATO.TYPE && !this.isArray() && this.type_generador != null;
         return this.tipo_asignado == 3 /* TYPE */ || this.valor instanceof type_1.Type;
     }
+    isNumber() {
+        return this.tipo_asignado == 1 /* NUMBER */ || typeof this.valor == 'number';
+    }
     hasTipoAsignado() {
         return this.tipo_asignado != null;
     }

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MasMas = void 0;
+exports.MenosMenos = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
 const instruccion_1 = require("../../instruccion");
-class MasMas extends instruccion_1.Instruccion {
+class MenosMenos extends instruccion_1.Instruccion {
     constructor(linea, id) {
         super(linea);
         Object.assign(this, { id });
@@ -19,7 +19,7 @@ class MasMas extends instruccion_1.Instruccion {
         const valor = variable.getValor();
         //Si no es un numero es error
         if (!variable.isNumber()) {
-            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se puede aplicar el operador ++ en la variable ${this.id} porque no es de tipo numerico` }));
+            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se puede aplicar el operador -- en la variable ${this.id} porque no es de tipo numerico` }));
             return;
         }
         //Si el valor no esta definido
@@ -27,8 +27,8 @@ class MasMas extends instruccion_1.Instruccion {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La variable ${this.id} no tiene un valor asignado de tipo numerico` }));
             return;
         }
-        variable.valor = valor + 1;
+        variable.valor = valor - 1;
         return valor;
     }
 }
-exports.MasMas = MasMas;
+exports.MenosMenos = MenosMenos;

@@ -54,6 +54,11 @@ import { If } from './if';
 import { InstruccionIf } from './expresiones/condicionales/instruccion_if';
 import { While } from './instrucciones/ciclos/while';
 import { DoWhile } from './instrucciones/ciclos/do_while';
+import { For } from './instrucciones/ciclos/for';
+import { MasMas } from './expresiones/aritmeticas/mas_mas';
+import { MenosMenos } from './expresiones/aritmeticas/menos_menos';
+import { ForOf } from './instrucciones/ciclos/for_of';
+import { ForIn } from './instrucciones/ciclos/for_in';
 
 export class Ejecucion {
   raiz: Object;
@@ -325,9 +330,15 @@ export class Ejecucion {
           if (nodo.hijos[0] == '[' && nodo.hijos[1] == ']') {
             return new Arreglo(nodo.linea);
           }
-          //EXP mas_mas
-          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '++') {
-            //TODO hacer porque esta yuca :(
+          //id mas_mas
+          if (nodo.hijos[1] == '++') {
+            const id = nodo.hijos[0];
+            return new MasMas(nodo.linea, id);
+          }
+          //id menos_menos
+          if (nodo.hijos[1] == '--') {
+            const id = nodo.hijos[0];
+            return new MenosMenos(nodo.linea, id);
           }
           //not EXP
           if (nodo.hijos[0] == '!' && this.soyNodo('EXP', nodo.hijos[1])) {
@@ -821,7 +832,7 @@ export class Ejecucion {
     }
 
     //WHILE
-    if(this.soyNodo('WHILE', nodo)){
+    if (this.soyNodo('WHILE', nodo)) {
       //while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
       const condicion = this.recorrer(nodo.hijos[2]);
       const instrucciones = this.recorrer(nodo.hijos[5]);
@@ -829,11 +840,67 @@ export class Ejecucion {
     }
 
     //DO_WHILE
-    if(this.soyNodo('DO_WHILE', nodo)){
+    if (this.soyNodo('DO_WHILE', nodo)) {
       //do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
       const instrucciones = this.recorrer(nodo.hijos[2]);
       const condicion = this.recorrer(nodo.hijos[6]);
       return new DoWhile(nodo.linea, instrucciones, condicion);
+    }
+
+    //ASIGNACION_FOR
+    if (this.soyNodo('ASIGNACION_FOR', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        // id TIPO_IGUAL EXP
+        case 3:
+          const tipo_igual = this.recorrer(nodo.hijos[1]);
+          const exp = this.recorrer(nodo.hijos[2]);
+          return new Asignacion(nodo.linea, id, tipo_igual, exp);
+        //id mas_mas | id menos_menos
+        case 2:
+          if (nodo.hijos[1] == '++')
+            return new MasMas(nodo.linea, id);
+          if (nodo.hijos[1] == '--')
+            return new MenosMenos(nodo.linea, id);
+      }
+    }
+
+    //FOR
+    if (this.soyNodo('FOR', nodo)) {
+      const condicion = this.recorrer(nodo.hijos[3]);
+      const asignacion_for = this.recorrer(nodo.hijos[5]);
+      const instrucciones = this.recorrer(nodo.hijos[8]);
+      //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+      if (this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])) {
+        const lista_instrucciones = this.recorrer(nodo.hijos[2]);
+        const declaracion = lista_instrucciones[0];
+        return new For(nodo.linea, declaracion, null, condicion, asignacion_for, instrucciones);
+      }
+      //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+      if (this.soyNodo('ASIGNACION', nodo.hijos[2])) {
+        const asignacion = this.recorrer(nodo.hijos[2]);
+        return new For(nodo.linea, null, asignacion, condicion, asignacion_for, instrucciones);
+      }
+    }
+
+    //FOR_OF
+    if(this.soyNodo('FOR_OF', nodo)){
+      //for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der
+      const tipo_declaracion = this.recorrer(nodo.hijos[2]);
+      const id = nodo.hijos[3];
+      const exp = this.recorrer(nodo.hijos[5]);
+      const instrucciones = this.recorrer(nodo.hijos[8]);
+      return new ForOf(nodo.linea, tipo_declaracion, id, exp, instrucciones);
+    }
+
+    //FOR_IN
+    if(this.soyNodo('FOR_IN', nodo)){
+      //for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der
+      const tipo_declaracion = this.recorrer(nodo.hijos[2]);
+      const id = nodo.hijos[3];
+      const exp = this.recorrer(nodo.hijos[5]);
+      const instrucciones = this.recorrer(nodo.hijos[8]);
+      return new ForIn(nodo.linea, tipo_declaracion, id, exp, instrucciones);
     }
 
   }
