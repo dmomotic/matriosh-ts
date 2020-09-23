@@ -6,30 +6,83 @@ const errores_1 = require("../../arbol/errores");
 const entorno_1 = require("../entorno");
 const instruccion_1 = require("../instruccion");
 const return_1 = require("../return");
+const _ = require("lodash");
+const tipo_1 = require("../tipo");
+const continue_1 = require("../continue");
+const break_1 = require("../break");
 class LlamadaFuncion extends instruccion_1.Instruccion {
-    constructor(linea, id) {
+    constructor(linea, id, lista_parametros = null) {
         super(linea);
-        Object.assign(this, { id });
+        Object.assign(this, { id, lista_parametros });
     }
     ejecutar(e) {
-        //Busco la funcion en el entorno
-        const funcion = e.getFuncion(this.id);
+        const entorno_aux = new entorno_1.Entorno();
+        const entorno_local = new entorno_1.Entorno(e);
+        const funcion = _.cloneDeep(e.getFuncion(this.id));
+        //Validacion de funcion existente
         if (!funcion) {
-            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se encontro la funcion ${this.id} en este entorno` }));
+            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No existe ninguna funcion con el nombre ${this.id}` }));
             return;
         }
-        const instrucciones = funcion.instrucciones;
-        const entorno = new entorno_1.Entorno(e);
-        for (let instruccion of instrucciones) {
-            const resp = instruccion.ejecutar(entorno);
-            //Validacion instruccion Return
-            if (resp instanceof return_1.Return) {
-                //Si no tiene un valor de retorno solo paro la funcion
-                if (!resp.hasValue())
-                    return;
-                //De lo contrario retorno el valor
-                return resp.getValue();
+        //Si la llamada  de la funcion trae parametros
+        if (this.lista_parametros) {
+            //Si la funcion no tiene parametros
+            if (!funcion.hasParametros()) {
+                errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} no recibe parametros` }));
+                return;
             }
+            //Si la funcion tiene parametros debe ser la misma cantidad
+            if (this.lista_parametros.length != funcion.lista_parametros.length) {
+                errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La cantidad de parametros no coincide ${this.id}` }));
+                return;
+            }
+            //Declaro los parametros
+            for (let i = 0; i < this.lista_parametros.length; i++) {
+                const exp = this.lista_parametros[i];
+                const variable = funcion.lista_parametros[i];
+                const valor = exp.ejecutar(entorno_local);
+                //Validacion de tipo a asignar
+                if (variable.hasTipoAsignado() && variable.tipo_asignado != tipo_1.getTipo(valor)) {
+                    errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El parametro ${variable.id} de la funcion ${this.id} no es del tipo enviado en la llamada de la funcion` }));
+                    return;
+                }
+                variable.valor = valor;
+                entorno_aux.setVariable(variable);
+            }
+        }
+        entorno_local.variables = _.cloneDeep(entorno_aux.variables);
+        //Ejecuto las instrucciones
+        for (let instruccion of funcion.instrucciones) {
+            const resp = instruccion.ejecutar(entorno_local);
+            //Validacion Return
+            if (resp instanceof return_1.Return) {
+                //Validacion de retorno en funcion
+                if (funcion.hasReturn() && resp.hasValue()) {
+                    //Valido el tipo del retorno
+                    if (tipo_1.getTipo(resp.getValue()) != funcion.tipo_return) {
+                        errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} esta retornando un tipo distinto al declarado` }));
+                        return;
+                    }
+                    return resp.getValue();
+                }
+                //Si la funcion tiene return pero el return no trae valor
+                if (funcion.hasReturn() && !resp.hasValue()) {
+                    errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+                    return;
+                }
+                //Si solo es un return
+                return;
+            }
+            //Validacion Break o Continue
+            if (resp instanceof break_1.Break || resp instanceof continue_1.Continue) {
+                errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Las instrucciones Break/Continue solo pueden ser utilizadas dentro de ciclos` }));
+                return;
+            }
+        }
+        //Valido si la funcion debia retornar algo
+        if (funcion.hasReturn()) {
+            errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+            return;
         }
     }
 }

@@ -60,6 +60,7 @@ const mas_mas_1 = require("./expresiones/aritmeticas/mas_mas");
 const menos_menos_1 = require("./expresiones/aritmeticas/menos_menos");
 const for_of_1 = require("./instrucciones/ciclos/for_of");
 const for_in_1 = require("./instrucciones/ciclos/for_in");
+const variable_1 = require("./variable");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -616,12 +617,38 @@ class Ejecucion {
         if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
             switch (nodo.hijos.length) {
                 //function id par_izq par_der llave_izq INSTRUCCIONES llave_der
-                case 7:
-                    {
-                        const id = nodo.hijos[1];
-                        const instrucciones = this.recorrer(nodo.hijos[5]);
-                        return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones);
-                    }
+                case 7: {
+                    const id = nodo.hijos[1];
+                    const instrucciones = this.recorrer(nodo.hijos[5]);
+                    return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones);
+                }
+                //function id par_izq LISTA_PARAMETROS par_der llave_izq INSTRUCCIONES llave_der
+                case 8: {
+                    const id = nodo.hijos[1];
+                    const lista_parametros = this.recorrer(nodo.hijos[3]);
+                    const instrucciones = this.recorrer(6);
+                    return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones, 5 /* VOID */, lista_parametros);
+                }
+                //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+                case 9: {
+                    const id = nodo.hijos[1];
+                    // {tipo, type_generador?}
+                    const tipo_variable_nativa = this.recorrer(nodo.hijos[5]);
+                    const tipo_return = tipo_variable_nativa.tipo;
+                    const instrucciones = this.recorrer(nodo.hijos[7]);
+                    return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return);
+                }
+                //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+                case 10: {
+                    const id = nodo.hijos[1];
+                    //[Variable ...]
+                    const lista_parametros = this.recorrer(nodo.hijos[3]);
+                    // {tipo, type_generador?}
+                    const tipo_variable_nativa = this.recorrer(nodo.hijos[6]);
+                    const tipo_return = tipo_variable_nativa.tipo;
+                    const instrucciones = this.recorrer(nodo.hijos[8]);
+                    return new declaracion_funcion_1.DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return, lista_parametros);
+                }
             }
         }
         //LLAMADA_FUNCION
@@ -631,6 +658,25 @@ class Ejecucion {
                 //id par_izq par_der punto_coma
                 case 4:
                     return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id);
+                //id par_izq LISTA_EXPRESIONES par_der punto_coma
+                case 5:
+                    //[EXP ...]
+                    const lista_expresiones = this.recorrer(nodo.hijos[2]);
+                    return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id, lista_expresiones);
+            }
+        }
+        //LLAMADA_FUNCION_EXP
+        if (this.soyNodo('LLAMADA_FUNCION_EXP', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                //id par_izq par_der
+                case 3:
+                    return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id);
+                //id par_izq LISTA_EXPRESIONES par_der
+                case 4:
+                    //[EXP ...]
+                    const lista_expresiones = this.recorrer(nodo.hijos[2]);
+                    return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id, lista_expresiones);
             }
         }
         //RETURN
@@ -838,6 +884,42 @@ class Ejecucion {
             const exp = this.recorrer(nodo.hijos[5]);
             const instrucciones = this.recorrer(nodo.hijos[8]);
             return new for_in_1.ForIn(nodo.linea, tipo_declaracion, id, exp, instrucciones);
+        }
+        //PARAMETRO
+        if (this.soyNodo('PARAMETRO', nodo)) {
+            const id = nodo.hijos[0];
+            //{tipo, tpe_generador?}
+            const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+            const tipo = tipo_variable_nativa.tipo;
+            switch (nodo.hijos.length) {
+                //id dos_puntos TIPO_VARIABLE_NATIVA
+                case 3:
+                    return new variable_1.Variable({ reasignable: true, id, tipo_asignado: tipo });
+                //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+                case 4:
+                    const dimensiones = this.recorrer(nodo.hijos[3]);
+                    return new variable_1.Variable({ reasignable: true, id, tipo_asignado: 4 /* ARRAY */, dimensiones });
+            }
+        }
+        //LISTA_PARAMETROS
+        if (this.soyNodo('LISTA_PARAMETROS', nodo)) {
+            const variables = [];
+            nodo.hijos.forEach((nodoHijo) => {
+                if (nodoHijo instanceof Object) {
+                    const resp = this.recorrer(nodoHijo);
+                    if (resp instanceof variable_1.Variable) {
+                        variables.push(resp);
+                    }
+                }
+            });
+            return variables; //[Variable...]
+        }
+        //TERNARIO
+        if (this.soyNodo('TERNARIO', nodo)) {
+            //EXP interrogacion EXP dos_puntos EXP
+            const condicion = this.recorrer(nodo.hijos[0]);
+            const exp_true = this.recorrer(nodo.hijos[2]);
+            const exp_false = this.recorrer(nodo.hijos[4]);
         }
     }
     /**

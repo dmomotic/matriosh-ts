@@ -10,7 +10,7 @@ export class Entorno {
   types: Map<String, Type>;
   funciones: Map<String, Funcion>;
 
-  constructor(padre?: Entorno, flag?: boolean) {
+  constructor(padre?: Entorno) {
     this.padre = padre != null ? padre : null;
     this.variables = new Map();
     this.types = new Map();
@@ -119,6 +119,12 @@ export class Entorno {
   getIdFuncionABuscar(id: string): string {
     const ids = id.split("_", 2);
     return ids[1] ?? '';
+  }
+
+  getEntornoGlobal() : Entorno{
+    for(let e : Entorno = this; e != null; e = e.padre){
+      if(e.padre == null) return e;
+    }
   }
 
 }

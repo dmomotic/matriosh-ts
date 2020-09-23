@@ -59,6 +59,7 @@ import { MasMas } from './expresiones/aritmeticas/mas_mas';
 import { MenosMenos } from './expresiones/aritmeticas/menos_menos';
 import { ForOf } from './instrucciones/ciclos/for_of';
 import { ForIn } from './instrucciones/ciclos/for_in';
+import { Variable } from './variable';
 
 export class Ejecucion {
   raiz: Object;
@@ -660,23 +661,69 @@ export class Ejecucion {
     if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
       switch (nodo.hijos.length) {
         //function id par_izq par_der llave_izq INSTRUCCIONES llave_der
-        case 7:
-          {
-            const id = nodo.hijos[1];
-            const instrucciones = this.recorrer(nodo.hijos[5]);
-            return new DeclaracionFuncion(nodo.linea, id, instrucciones);
-          }
+        case 7: {
+          const id = nodo.hijos[1];
+          const instrucciones = this.recorrer(nodo.hijos[5]);
+          return new DeclaracionFuncion(nodo.linea, id, instrucciones);
+        }
+        //function id par_izq LISTA_PARAMETROS par_der llave_izq INSTRUCCIONES llave_der
+        case 8: {
+          const id = nodo.hijos[1];
+          const lista_parametros = this.recorrer(nodo.hijos[3]);
+          const instrucciones = this.recorrer(6);
+          return new DeclaracionFuncion(nodo.linea, id, instrucciones, TIPO_DATO.VOID, lista_parametros);
+        }
+        //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+        case 9: {
+          const id = nodo.hijos[1];
+          // {tipo, type_generador?}
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[5]);
+          const tipo_return = tipo_variable_nativa.tipo;
+          const instrucciones = this.recorrer(nodo.hijos[7]);
+          return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return);
+        }
+        //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+        case 10: {
+          const id = nodo.hijos[1];
+          //[Variable ...]
+          const lista_parametros = this.recorrer(nodo.hijos[3]);
+
+          // {tipo, type_generador?}
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[6]);
+          const tipo_return = tipo_variable_nativa.tipo;
+          const instrucciones = this.recorrer(nodo.hijos[8]);
+          return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return, lista_parametros);
+        }
       }
     }
 
     //LLAMADA_FUNCION
     if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
       const id = nodo.hijos[0];
-
       switch (nodo.hijos.length) {
         //id par_izq par_der punto_coma
         case 4:
           return new LlamadaFuncion(nodo.linea, id);
+        //id par_izq LISTA_EXPRESIONES par_der punto_coma
+        case 5:
+          //[EXP ...]
+          const lista_expresiones = this.recorrer(nodo.hijos[2]);
+          return new LlamadaFuncion(nodo.linea, id, lista_expresiones);
+      }
+    }
+
+    //LLAMADA_FUNCION_EXP
+    if (this.soyNodo('LLAMADA_FUNCION_EXP', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        //id par_izq par_der
+        case 3:
+          return new LlamadaFuncion(nodo.linea, id);
+        //id par_izq LISTA_EXPRESIONES par_der
+        case 4:
+          //[EXP ...]
+          const lista_expresiones = this.recorrer(nodo.hijos[2]);
+          return new LlamadaFuncion(nodo.linea, id, lista_expresiones);
       }
     }
 
@@ -884,7 +931,7 @@ export class Ejecucion {
     }
 
     //FOR_OF
-    if(this.soyNodo('FOR_OF', nodo)){
+    if (this.soyNodo('FOR_OF', nodo)) {
       //for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der
       const tipo_declaracion = this.recorrer(nodo.hijos[2]);
       const id = nodo.hijos[3];
@@ -894,7 +941,7 @@ export class Ejecucion {
     }
 
     //FOR_IN
-    if(this.soyNodo('FOR_IN', nodo)){
+    if (this.soyNodo('FOR_IN', nodo)) {
       //for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der
       const tipo_declaracion = this.recorrer(nodo.hijos[2]);
       const id = nodo.hijos[3];
@@ -903,6 +950,44 @@ export class Ejecucion {
       return new ForIn(nodo.linea, tipo_declaracion, id, exp, instrucciones);
     }
 
+    //PARAMETRO
+    if (this.soyNodo('PARAMETRO', nodo)) {
+      const id = nodo.hijos[0];
+      //{tipo, tpe_generador?}
+      const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+      const tipo = tipo_variable_nativa.tipo;
+      switch (nodo.hijos.length) {
+        //id dos_puntos TIPO_VARIABLE_NATIVA
+        case 3:
+          return new Variable({ reasignable: true, id, tipo_asignado: tipo });
+        //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+        case 4:
+          const dimensiones = this.recorrer(nodo.hijos[3]);
+          return new Variable({ reasignable: true, id, tipo_asignado: TIPO_DATO.ARRAY, dimensiones });
+      }
+    }
+
+    //LISTA_PARAMETROS
+    if (this.soyNodo('LISTA_PARAMETROS', nodo)) {
+      const variables = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if(nodoHijo instanceof Object){
+          const resp = this.recorrer(nodoHijo);
+          if (resp instanceof Variable) {
+            variables.push(resp);
+          }
+        }
+      });
+      return variables; //[Variable...]
+    }
+
+    //TERNARIO
+    if(this.soyNodo('TERNARIO', nodo)){
+      //EXP interrogacion EXP dos_puntos EXP
+      const condicion = this.recorrer(nodo.hijos[0]);
+      const exp_true = this.recorrer(nodo.hijos[2]);
+      const exp_false = this.recorrer(nodo.hijos[4]);
+    }
   }
 
   /**

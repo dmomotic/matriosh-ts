@@ -125,7 +125,7 @@ INSTRUCCIONES
 
 INSTRUCCION
   : DECLARACION_VARIABLE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | DECLARACION_FUNCION /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | DECLARACION_FUNCION /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | DECLARACION_TYPE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | ASIGNACION /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | PUSH_ARREGLO /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
@@ -141,15 +141,15 @@ INSTRUCCION
   | FOR_OF /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | FOR_IN /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
   | GRAFICAR_TS /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
-  | LLAMADA_FUNCION /*-->TR<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
+  | LLAMADA_FUNCION /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'INSTRUCCION', hijos: [$1], linea: yylineno}); }
 ;
 
-LLAMADA_FUNCION /*-->TR<--*/
+LLAMADA_FUNCION /*-->TR - EJ<--*/
   : id par_izq par_der punto_coma { $$ = new NodoAST({label: 'LLAMADA_FUNCION', hijos: [$1,$2,$3,$4], linea: yylineno}); }
   | id par_izq LISTA_EXPRESIONES par_der punto_coma { $$ = new NodoAST({label: 'LLAMADA_FUNCION', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
-LLAMADA_FUNCION_EXP /*-->TR<--*/
+LLAMADA_FUNCION_EXP /*-->TR - EJ<--*/
   : id par_izq par_der { $$ = new NodoAST({label: 'LLAMADA_FUNCION_EXP', hijos: [$1,$2,$3], linea: yylineno}); }
   | id par_izq LISTA_EXPRESIONES par_der { $$ = new NodoAST({label: 'LLAMADA_FUNCION_EXP', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
@@ -268,7 +268,7 @@ PUSH_ARREGLO /*-->TR - EJ<--*/
 
 DECLARACION_FUNCION /*-->TR<--*/
   //Funcion sin parametros y con tipo -> function test() : TIPO { INSTRUCCIONES } --> TR <--
-  /*-->TR<--*/
+  /*-->TR - EJ<--*/
   : function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9], linea: yylineno}); }
 
   //Funcion sin parametros y sin tipo -> function test() { INSTRUCCIONES }
@@ -276,21 +276,21 @@ DECLARACION_FUNCION /*-->TR<--*/
   | function id par_izq par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7], linea: yylineno}); }
 
   //Funcion con parametros y con tipo -> function test ( LISTA_PARAMETROS ) : TIPO { INSTRUCCIONES }
-  /*-->TR<--*/
+  /*-->TR - EJ<--*/
   | function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10], linea: yylineno}); }
 
   //Funcion con parametros y sin tipo -> function test ( LISTA_PARAMETROS ) { INSTRUCCIONES }
-  /*-->TR<--*/
+  /*-->TR - EJ<--*/
   | function id par_izq LISTA_PARAMETROS par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8], linea: yylineno}); }
 
 ;
 
-LISTA_PARAMETROS /*-->TR<--*/
+LISTA_PARAMETROS /*-->TR - EJ<--*/
   : LISTA_PARAMETROS coma PARAMETRO { $$ = new NodoAST({label: 'LISTA_PARAMETROS', hijos: [...$1.hijos,$2,$3], linea: yylineno}); } //Revisar si agrego o no coma
   | PARAMETRO { $$ = new NodoAST({label: 'LISTA_PARAMETROS', hijos: [$1], linea: yylineno}); }
 ;
 
-PARAMETRO /*-->TR<--*/
+PARAMETRO /*-->TR - EJ<--*/
   : id dos_puntos TIPO_VARIABLE_NATIVA { $$ = new NodoAST({label: 'PARAMETRO', hijos: [$1, $2, $3], linea: yylineno}); }
   | id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES { $$ = new NodoAST({label: 'PARAMETRO', hijos: [$1, $2, $3, $4], linea: yylineno}); }
 ;
@@ -388,7 +388,7 @@ EXP
   | EXP or EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | not EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   //Valores Primitivos
-  | number /*-->TR -EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'NUMBER', hijos: [$1], linea: yylineno})], linea: yylineno}); }
+  | number /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'NUMBER', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   | string /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   | id /*-->TR - EJ<--*/  { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'ID', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   | true /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'BOOLEAN', hijos: [$1], linea: yylineno})], linea: yylineno}); }
@@ -401,15 +401,15 @@ EXP
   | ARRAY_LENGTH /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_POP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Types - accesos
-  | ACCESO_TYPE /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | TYPE /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | ACCESO_TYPE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | TYPE /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Ternario
   | TERNARIO /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Funciones
-  | LLAMADA_FUNCION_EXP /*-->TR<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | LLAMADA_FUNCION_EXP /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
 ;
 
-TYPE /*-->TR<--*/
+TYPE /*-->TR - EJ<--*/
   : llave_izq ATRIBUTOS_TYPE llave_der { $$ = new NodoAST({label: 'TYPE', hijos: [$1,$2,$3], linea: yylineno}); }
 ;
 

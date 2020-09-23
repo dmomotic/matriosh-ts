@@ -4,7 +4,7 @@ exports.Entorno = void 0;
 const _ = require("lodash");
 const entorno_aux_1 = require("./entorno_aux");
 class Entorno {
-    constructor(padre, flag) {
+    constructor(padre) {
         this.padre = padre != null ? padre : null;
         this.variables = new Map();
         this.types = new Map();
@@ -107,6 +107,12 @@ class Entorno {
         var _a;
         const ids = id.split("_", 2);
         return (_a = ids[1]) !== null && _a !== void 0 ? _a : '';
+    }
+    getEntornoGlobal() {
+        for (let e = this; e != null; e = e.padre) {
+            if (e.padre == null)
+                return e;
+        }
     }
 }
 exports.Entorno = Entorno;
