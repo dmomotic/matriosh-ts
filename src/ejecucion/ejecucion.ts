@@ -60,6 +60,11 @@ import { MenosMenos } from './expresiones/aritmeticas/menos_menos';
 import { ForOf } from './instrucciones/ciclos/for_of';
 import { ForIn } from './instrucciones/ciclos/for_in';
 import { Variable } from './variable';
+import { Ternario } from './expresiones/condicionales/ternario';
+import { Case } from './case';
+import { Switch } from './expresiones/condicionales/switch';
+import { Entornos } from './entornos';
+import { GraficarTS } from './instrucciones/graficar_ts';
 
 export class Ejecucion {
   raiz: Object;
@@ -110,7 +115,6 @@ export class Ejecucion {
     if (instrucciones instanceof Array) {
       //Entorno global, limpieza de errores y limpieza de la salida
       const entorno = new Entorno();
-      Errores.getInstance().clear();
       Salida.getInstance().clear();
 
       instrucciones.forEach(element => {
@@ -123,6 +127,7 @@ export class Ejecucion {
         }
       });
 
+      Entornos.getInstance().push(entorno);
     }
   }
 
@@ -987,6 +992,50 @@ export class Ejecucion {
       const condicion = this.recorrer(nodo.hijos[0]);
       const exp_true = this.recorrer(nodo.hijos[2]);
       const exp_false = this.recorrer(nodo.hijos[4]);
+      return new Ternario(nodo.linea, condicion, exp_true, exp_false);
+    }
+
+    //SWITCH
+    if(this.soyNodo('SWITCH', nodo)){
+      //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
+      const exp = this.recorrer(nodo.hijos[2]);
+      const lista_case = this.recorrer(nodo.hijos[5]);
+      return new Switch(nodo.linea, exp, lista_case);
+    }
+
+    //CASE
+    if(this.soyNodo('CASE', nodo)){
+      //case EXP dos_puntos INSTRUCCIONES
+      const exp = this.recorrer(nodo.hijos[1]);
+      const instrucciones = this.recorrer(nodo.hijos[3]);
+      return new Case(exp, instrucciones);
+    }
+
+    //DEFAULT
+    if(this.soyNodo('DEFAULT', nodo)){
+      //default dos_puntos INSTRUCCIONES
+      const instrucciones = this.recorrer(nodo.hijos[2]);
+      return new Case(null, instrucciones, true);
+    }
+
+    //LISTA_CASE
+    if(this.soyNodo('LISTA_CASE', nodo)){
+      const lista = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if(nodoHijo instanceof Object){
+          const resp = this.recorrer(nodoHijo);
+          if(resp instanceof Case){
+            lista.push(resp);
+          }
+        }
+      });
+      return lista; //[Case ...]
+    }
+
+    //GRAFICAR_TS
+    if(this.soyNodo('GRAFICAR_TS', nodo)){
+      //graficar_ts par_izq par_der punto_coma
+      return new GraficarTS(nodo.linea);
     }
   }
 

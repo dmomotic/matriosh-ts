@@ -17,8 +17,12 @@ class DoWhile extends instruccion_1.Instruccion {
             const entorno = new entorno_1.Entorno(e);
             for (let instruccion of this.instrucciones) {
                 const resp = instruccion.ejecutar(entorno);
-                //Validacion de instruccion Return o Break
-                if (resp instanceof return_1.Return || resp instanceof break_1.Break) {
+                //Validacion de instruccion Return
+                if (resp instanceof return_1.Return) {
+                    return resp;
+                }
+                //Validacion de instrucion Break
+                if (resp instanceof break_1.Break) {
                     return;
                 }
                 //Validacion de instruccion Continue

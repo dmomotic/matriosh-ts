@@ -40,4 +40,19 @@ export class Type{
     salida += '}'
     return salida;
   }
+
+  public getSalidaBase() : String{
+    let salida = '{';
+    let i = 0;
+    const size = this.atributos.size - 1;
+    for (let [key, value] of this.atributos) {
+      salida += `${key}: `;
+      if(i != size){
+        salida += ', '
+      }
+      i++;
+    }
+    salida += '}'
+    return salida;
+  }
 }

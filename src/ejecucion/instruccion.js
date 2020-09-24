@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Instruccion = void 0;
 class Instruccion {
     constructor(linea) {
-        Object.assign(this, { linea });
+        const valor = +linea + 1;
+        Object.assign(this, { linea: valor.toString() });
     }
     getLinea() {
         return this.linea;

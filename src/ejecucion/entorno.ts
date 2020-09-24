@@ -121,10 +121,22 @@ export class Entorno {
     return ids[1] ?? '';
   }
 
-  getEntornoGlobal() : Entorno{
-    for(let e : Entorno = this; e != null; e = e.padre){
-      if(e.padre == null) return e;
+  getEntornoGlobal(): Entorno {
+    for (let e: Entorno = this; e != null; e = e.padre) {
+      if (e.padre == null) return e;
     }
+  }
+
+  public toString(): string {
+    let salida = `*** VARIABLES ****\n`;
+    for (let variable of Array.from(this.variables.values())) {
+      salida += variable.toString() + '\n';
+    }
+    return salida;
+  }
+
+  getVariables() : Array<Variable>{
+    return Array.from(this.variables.values());
   }
 
 }

@@ -14,5 +14,9 @@ class Funcion {
     getParametrosSize() {
         return this.hasParametros() ? this.lista_parametros.length : 0;
     }
+    toString() {
+        let salida = `Funcion: ${this.id} - Parametros: ${this.lista_parametros.length} - Return Asignado: ${this.hasReturn() ? 'Si' : 'No'}`;
+        return salida;
+    }
 }
 exports.Funcion = Funcion;

@@ -26,8 +26,12 @@ class For extends instruccion_1.Instruccion {
             //Ejecuto las instrucciones del ciclo for
             for (let instruccion of this.instrucciones) {
                 const resp = instruccion.ejecutar(entorno_for);
-                //Validacion instruccion Return | Break
-                if (resp instanceof return_1.Return || resp instanceof break_1.Break) {
+                //Validacion de instruccion Return
+                if (resp instanceof return_1.Return) {
+                    return resp;
+                }
+                //Validacion de instrucion Break
+                if (resp instanceof break_1.Break) {
                     return;
                 }
                 //Validacion instruccion Continue

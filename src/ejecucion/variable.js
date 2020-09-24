@@ -27,5 +27,9 @@ class Variable {
     getValor() {
         return this.valor;
     }
+    toString() {
+        let salida = `Variable: ${this.id} - Valor: ${this.valor} - Constante: ${this.reasignable ? 'No' : 'Si'}`;
+        return salida;
+    }
 }
 exports.Variable = Variable;

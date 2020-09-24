@@ -39,8 +39,12 @@ export class ForOf extends Instruccion{
       //Ejecuto las instruccion
       for(let instruccion of this.instrucciones){
         const resp = instruccion.ejecutar(entorno);
-        //Validacion instruccion Return | Break
-        if(resp instanceof Return || resp instanceof Break){
+        //Validacion de instruccion Return
+        if(resp instanceof Return){
+          return resp;
+        }
+        //Validacion de instrucion Break
+        if(resp instanceof Break){
           return;
         }
         //Validacion instruccion Continue

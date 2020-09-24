@@ -1,5 +1,5 @@
 import { Arreglo } from './arreglo';
-import { TIPO, TIPO_DATO } from './tipo';
+import { TIPO_DATO } from './tipo';
 import { Type } from './type';
 
 export class Variable {
@@ -38,6 +38,11 @@ export class Variable {
 
   getValor() : any {
     return this.valor;
+  }
+
+  public toString() : string{
+    let salida = `Variable: ${this.id} - Valor: ${this.valor} - Constante: ${this.reasignable?'No':'Si'}`;
+    return salida;
   }
 
 }

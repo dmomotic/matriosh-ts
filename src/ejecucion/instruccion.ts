@@ -5,7 +5,8 @@ export abstract class Instruccion{
   abstract ejecutar(e : Entorno) : any;
 
   constructor(linea: string){
-    Object.assign(this, {linea});
+    const valor = +linea + 1;
+    Object.assign(this, {linea: valor.toString()});
   }
 
   getLinea() : string{

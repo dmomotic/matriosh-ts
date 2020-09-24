@@ -21,8 +21,12 @@ export class While extends Instruccion{
       //Ejecuto las instrucciones
       for(let instruccion of this.instrucciones){
         const resp = instruccion.ejecutar(entorno);
-        //Validacion de instruccion Return o Break
-        if(resp instanceof Return || resp instanceof Break){
+        ///Validacion de instruccion Return
+        if(resp instanceof Return){
+          return resp;
+        }
+        //Validacion de instrucion Break
+        if(resp instanceof Break){
           return;
         }
         //Validacion de instruccion Continue

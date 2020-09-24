@@ -15,7 +15,9 @@
         <q-card class="my-card">
           <q-tabs v-model="tab" class="text-white bg-deep-orange-5">
             <q-tab label="Editor" name="editor" />
+            <q-tab label="Errores" name="errores" v-if="errores.length > 0" />
             <q-tab label="Consola" name="consola" />
+            <q-tab label="Tabla de Símbolos" name="tabla_de_simbolos" v-if="entornos.length > 0" />
             <q-tab label="AST" name="ast" />
           </q-tabs>
 
@@ -26,12 +28,37 @@
               <codemirror v-model="code" :options="cmOptions" />
             </q-tab-panel>
 
+            <q-tab-panel name="errores" v-if="errores.length > 0">
+              <div class="q-pa-md">
+                <q-table
+                  title="Lista de Errores Obtenidos"
+                  :data="errores"
+                  :columns="columns"
+                  row-key="name"
+                  dark
+                  color="amber"
+                  dense
+                  :pagination="{ rowsPerPage: 0 }"
+                  rows-per-page-label="Errores por página"
+                />
+              </div>
+            </q-tab-panel>
+
             <q-tab-panel name="consola" class="bg-grey-10 text-white">
               <q-list dark bordered separator dense>
-                <q-item clickable v-ripple v-for="(item, index) in salida" :key="index">
+                <q-item
+                  clickable
+                  v-ripple
+                  v-for="(item, index) in salida"
+                  :key="index"
+                >
                   <q-item-section>{{ item }}</q-item-section>
                 </q-item>
               </q-list>
+            </q-tab-panel>
+
+            <q-tab-panel name="tabla_de_simbolos" v-if="entornos.length > 0">
+              <tabla-simbolos :entornos="entornos" />
             </q-tab-panel>
 
             <q-tab-panel name="ast" style="height: 500px">
@@ -59,11 +86,15 @@ import AnalizadorTraduccion from "../analizador/gramatica_traduccion";
 import { Traduccion } from "../traduccion/traduccion";
 import { Variable } from "../traduccion/variable";
 import { Ejecucion } from "../ejecucion/ejecucion";
+import { Errores } from "../arbol/errores";
+import { Error as InstanciaError } from "../arbol/error";
+import { Entornos } from "../ejecucion/entornos";
 
 export default {
   components: {
     codemirror,
     ast: require("../components/Ast").default,
+    tablaSimbolos: require("../components/TablaSimbolos").default
   },
   data() {
     return {
@@ -82,6 +113,18 @@ export default {
       dot: "",
       contadorDot: 0,
       salida: [],
+      errores: [],
+      columns: [
+        { name: "tipo", label: "Tipo", field: "tipo", align: "left" },
+        { name: "linea", label: "Linea", field: "linea", align: "left" },
+        {
+          name: "descripcion",
+          label: "Descripcion",
+          field: "descripcion",
+          align: "left",
+        },
+      ],
+      entornos: []
     };
   },
   methods: {
@@ -103,6 +146,11 @@ export default {
       });
     },
     analizar() {
+      if (this.code.trim() == "") {
+        this.notificar("primary", `Ingrese algo de código, por favor`);
+        return;
+      }
+      this.inicializarValores();
       try {
         const raizTraduccion = AnalizadorTraduccion.parse(this.code);
         //Validación de raiz
@@ -120,9 +168,15 @@ export default {
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
       }
+      this.errores = Errores.getInstance().lista;
     },
     traducir() {},
     ejecutar() {
+      if (this.code.trim() == "") {
+        this.notificar("primary", `Ingrese algo de código, por favor`);
+        return;
+      }
+      this.inicializarValores();
       try {
         const raiz = AnalizadorTraduccion.parse(this.code);
         //Validacion de raiz
@@ -136,11 +190,39 @@ export default {
         let ejecucion = new Ejecucion(raiz);
         this.dot = ejecucion.getDot();
         ejecucion.ejecutar();
-        ejecucion.imprimirErrores();
+        // ejecucion.imprimirErrores();
         this.salida = ejecucion.getSalida();
         this.notificar("primary", "Ejecución realizada con éxito");
       } catch (error) {
-        this.notificar("negative", JSON.stringify(error));
+        this.validarError(error);
+      }
+      this.errores = Errores.getInstance().lista;
+      this.entornos = Entornos.getInstance().lista;
+    },
+    inicializarValores() {
+      Errores.getInstance().clear();
+      Entornos.getInstance().clear();
+    },
+    validarError(error) {
+      const json = JSON.stringify(error);
+      this.notificar(
+        "negative",
+        `No fue posible recuperarse de un error :(\nNo me pongan 0 por favor`
+      );
+      const objeto = JSON.parse(json);
+
+      if (
+        objeto != null &&
+        objeto instanceof Object &&
+        objeto.hasOwnProperty("hash")
+      ) {
+        Errores.getInstance().push(
+          new InstanciaError({
+            tipo: "sintactico",
+            linea: objeto.hash.loc.first_line,
+            descripcion: `No se esperaba el token: "${objeto.hash.token}" en la columna ${objeto.hash.loc.last_column}, se esperaba uno de los siguientes: ${objeto.hash.expected}`,
+          })
+        );
       }
     },
   },

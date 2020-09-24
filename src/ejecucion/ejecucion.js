@@ -61,6 +61,11 @@ const menos_menos_1 = require("./expresiones/aritmeticas/menos_menos");
 const for_of_1 = require("./instrucciones/ciclos/for_of");
 const for_in_1 = require("./instrucciones/ciclos/for_in");
 const variable_1 = require("./variable");
+const ternario_1 = require("./expresiones/condicionales/ternario");
+const case_1 = require("./case");
+const switch_1 = require("./expresiones/condicionales/switch");
+const entornos_1 = require("./entornos");
+const graficar_ts_1 = require("./instrucciones/graficar_ts");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -103,7 +108,6 @@ class Ejecucion {
         if (instrucciones instanceof Array) {
             //Entorno global, limpieza de errores y limpieza de la salida
             const entorno = new entorno_1.Entorno();
-            errores_1.Errores.getInstance().clear();
             salida_1.Salida.getInstance().clear();
             instrucciones.forEach(element => {
                 if (element instanceof instruccion_1.Instruccion) {
@@ -114,6 +118,7 @@ class Ejecucion {
                     }
                 }
             });
+            entornos_1.Entornos.getInstance().push(entorno);
         }
     }
     getSalida() {
@@ -920,6 +925,45 @@ class Ejecucion {
             const condicion = this.recorrer(nodo.hijos[0]);
             const exp_true = this.recorrer(nodo.hijos[2]);
             const exp_false = this.recorrer(nodo.hijos[4]);
+            return new ternario_1.Ternario(nodo.linea, condicion, exp_true, exp_false);
+        }
+        //SWITCH
+        if (this.soyNodo('SWITCH', nodo)) {
+            //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
+            const exp = this.recorrer(nodo.hijos[2]);
+            const lista_case = this.recorrer(nodo.hijos[5]);
+            return new switch_1.Switch(nodo.linea, exp, lista_case);
+        }
+        //CASE
+        if (this.soyNodo('CASE', nodo)) {
+            //case EXP dos_puntos INSTRUCCIONES
+            const exp = this.recorrer(nodo.hijos[1]);
+            const instrucciones = this.recorrer(nodo.hijos[3]);
+            return new case_1.Case(exp, instrucciones);
+        }
+        //DEFAULT
+        if (this.soyNodo('DEFAULT', nodo)) {
+            //default dos_puntos INSTRUCCIONES
+            const instrucciones = this.recorrer(nodo.hijos[2]);
+            return new case_1.Case(null, instrucciones, true);
+        }
+        //LISTA_CASE
+        if (this.soyNodo('LISTA_CASE', nodo)) {
+            const lista = [];
+            nodo.hijos.forEach((nodoHijo) => {
+                if (nodoHijo instanceof Object) {
+                    const resp = this.recorrer(nodoHijo);
+                    if (resp instanceof case_1.Case) {
+                        lista.push(resp);
+                    }
+                }
+            });
+            return lista; //[Case ...]
+        }
+        //GRAFICAR_TS
+        if (this.soyNodo('GRAFICAR_TS', nodo)) {
+            //graficar_ts par_izq par_der punto_coma
+            return new graficar_ts_1.GraficarTS(nodo.linea);
         }
     }
     /**
