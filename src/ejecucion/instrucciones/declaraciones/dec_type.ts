@@ -34,22 +34,22 @@ export class DecType extends Instruccion{
       const reasignable = true;
 
       // {id, tipo}
-      if(id && tipo_asignado && !type_generador && !dimensiones){
+      if(id && tipo_asignado != null && !type_generador && !dimensiones){
         const atributo = new Variable({reasignable,id,tipo_asignado});
         atributos.setVariable(atributo);
       }
       // {id, tipo, type_generador}
-      if(id && tipo_asignado && type_generador && !dimensiones){
+      if(id && tipo_asignado != null && type_generador && !dimensiones){
         const atributo = new Variable({reasignable, id, tipo_asignado, type_generador});
         atributos.setVariable(atributo);
       }
       // {id, tipo, dimensiones}
-      if(id && tipo_asignado && !type_generador && dimensiones){
+      if(id && tipo_asignado != null && !type_generador && dimensiones){
         const atributo = new Variable({reasignable, id, tipo_asignado, dimensiones});
         atributos.setVariable(atributo);
       }
       // {id, tipo, type_generador, dimensiones}
-      if(id && tipo_asignado && type_generador && dimensiones){
+      if(id && tipo_asignado != null && type_generador && dimensiones){
         const atributo = new Variable({reasignable, id, tipo_asignado, type_generador, dimensiones})
         atributos.setVariable(atributo);
       }

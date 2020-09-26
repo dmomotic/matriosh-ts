@@ -29,22 +29,22 @@ class DecType extends instruccion_1.Instruccion {
             //Valores comunnes
             const reasignable = true;
             // {id, tipo}
-            if (id && tipo_asignado && !type_generador && !dimensiones) {
+            if (id && tipo_asignado != null && !type_generador && !dimensiones) {
                 const atributo = new variable_1.Variable({ reasignable, id, tipo_asignado });
                 atributos.setVariable(atributo);
             }
             // {id, tipo, type_generador}
-            if (id && tipo_asignado && type_generador && !dimensiones) {
+            if (id && tipo_asignado != null && type_generador && !dimensiones) {
                 const atributo = new variable_1.Variable({ reasignable, id, tipo_asignado, type_generador });
                 atributos.setVariable(atributo);
             }
             // {id, tipo, dimensiones}
-            if (id && tipo_asignado && !type_generador && dimensiones) {
+            if (id && tipo_asignado != null && !type_generador && dimensiones) {
                 const atributo = new variable_1.Variable({ reasignable, id, tipo_asignado, dimensiones });
                 atributos.setVariable(atributo);
             }
             // {id, tipo, type_generador, dimensiones}
-            if (id && tipo_asignado && type_generador && dimensiones) {
+            if (id && tipo_asignado != null && type_generador && dimensiones) {
                 const atributo = new variable_1.Variable({ reasignable, id, tipo_asignado, type_generador, dimensiones });
                 atributos.setVariable(atributo);
             }

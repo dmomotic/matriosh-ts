@@ -272,8 +272,8 @@ PUSH_ARREGLO /*-->TR - EJ<--*/
   | id LISTA_ACCESOS_TYPE punto push par_izq EXP par_der punto_coma /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'PUSH_ARREGLO', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
 ;
 
-DECLARACION_FUNCION /*-->TR<--*/
-  //Funcion sin parametros y con tipo -> function test() : TIPO { INSTRUCCIONES } --> TR <--
+DECLARACION_FUNCION /*-->TR - EJ<--*/
+  //Funcion sin parametros y con tipo -> function test() : TIPO { INSTRUCCIONES }
   /*-->TR - EJ<--*/
   : function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9], linea: yylineno}); }
 
@@ -336,7 +336,7 @@ LISTA_DECLARACIONES /*-->TR - EJ<--*/
 ;
 
 //let id : TIPO_VARIABLE_NATIVA LISTA_CORCHETES = EXP ;
-DEC_ID_TIPO_CORCHETES_EXP /*-->TR<--*/
+DEC_ID_TIPO_CORCHETES_EXP /*-->TR - EJ<--*/
   : id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES igual EXP { $$ = new NodoAST({label: 'DEC_ID_TIPO_CORCHETES_EXP', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
 ;
 
@@ -361,7 +361,7 @@ DEC_ID  /*-->TR - EJ<--*/
 ;
 
 //let id : TIPO_VARIABLE_NATIVA LISTA_CORCHETES ;
-DEC_ID_TIPO_CORCHETES /*-->TR<--*/
+DEC_ID_TIPO_CORCHETES /*-->TR - EJ<--*/
   : id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES { $$ = new NodoAST({label: 'DEC_ID_TIPO_CORCHETES', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
 
@@ -434,7 +434,6 @@ ARRAY_LENGTH /*-->TR - EJ<--*/
   | id LISTA_ACCESOS_TYPE punto length /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'ARRAY_LENGTH', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
 
-//Revisar id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der
 ARRAY_POP /*-->TR - EJ<--*/
   : id punto pop par_izq par_der /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'ARRAY_POP', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
   | id LISTA_ACCESOS_ARREGLO punto pop par_izq par_der /*-->TR - EJ<--*/ { $$ = new NodoAST({label: 'ARRAY_POP', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
@@ -485,6 +484,6 @@ TIPO_VARIABLE_NATIVA
   | id      { $$ = new NodoAST({label: 'TIPO_VARIABLE_NATIVA', hijos: [new NodoAST({label: 'ID', hijos: [$1], linea: yylineno})], linea: yylineno}); }
 ;
 
-CONSOLE_LOG /*-->TR<--*/
+CONSOLE_LOG /*-->TR - EJ<--*/
   : console punto log par_izq LISTA_EXPRESIONES par_der punto_coma { $$ = new NodoAST({label: 'CONSOLE_LOG', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
 ;

@@ -50,7 +50,15 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
                 entorno_aux.setVariable(variable);
             }
         }
-        entorno_local.variables = _.cloneDeep(entorno_aux.variables);
+        //Si la llamada de la funcion no trae parametros
+        else {
+            //Es un error solo si la funcion tiene paremetros
+            if (funcion.hasParametros()) {
+                errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe recibir ${funcion.getParametrosSize()} parametros` }));
+                return;
+            }
+        }
+        entorno_local.variables = entorno_aux.variables;
         //Ejecuto las instrucciones
         for (let instruccion of funcion.instrucciones) {
             const resp = instruccion.ejecutar(entorno_local);
@@ -59,7 +67,7 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
                 //Validacion de retorno en funcion
                 if (funcion.hasReturn() && resp.hasValue()) {
                     //Valido el tipo del retorno
-                    if (tipo_1.getTipo(resp.getValue()) != funcion.tipo_return) {
+                    if (resp.getValue() != null && tipo_1.getTipo(resp.getValue()) != funcion.tipo_return) {
                         errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} esta retornando un tipo distinto al declarado` }));
                         return;
                     }
@@ -68,6 +76,11 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
                 //Si la funcion tiene return pero el return no trae valor
                 if (funcion.hasReturn() && !resp.hasValue()) {
                     errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+                    return;
+                }
+                //Si la funcion no debe tener return y el return trae un valor
+                if (!funcion.hasReturn() && resp.hasValue()) {
+                    errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} no debe retornar un valor` }));
                     return;
                 }
                 //Si solo es un return

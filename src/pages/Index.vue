@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12">
         <q-btn-group push spread>
-          <q-btn push label="Traducir" icon="transform" @click="analizar" />
+          <q-btn push label="Traducir" icon="transform" @click="traducir" />
           <q-btn push label="Ejecutar" icon="play_arrow" @click="ejecutar" />
         </q-btn-group>
       </div>
@@ -15,9 +15,13 @@
         <q-card class="my-card">
           <q-tabs v-model="tab" class="text-white bg-deep-orange-5">
             <q-tab label="Editor" name="editor" />
-            <q-tab label="Errores" name="errores" v-if="errores.length > 0" />
+            <q-tab label="Errores" name="errores" v-if="errores != null && errores.length > 0" />
             <q-tab label="Consola" name="consola" />
-            <q-tab label="Tabla de Símbolos" name="tabla_de_simbolos" v-if="entornos.length > 0" />
+            <q-tab
+              label="Tabla de Símbolos"
+              name="tabla_de_simbolos"
+              v-if="entornos != null && entornos.length > 0"
+            />
             <q-tab label="AST" name="ast" />
           </q-tabs>
 
@@ -25,10 +29,10 @@
 
           <q-tab-panels v-model="tab" animated>
             <q-tab-panel name="editor">
-              <codemirror v-model="code" :options="cmOptions" />
+              <codemirror v-model="code" :options="cmOptions" @input="codigoEditado" />
             </q-tab-panel>
 
-            <q-tab-panel name="errores" v-if="errores.length > 0">
+            <q-tab-panel name="errores" v-if="errores != null && errores.length > 0">
               <div class="q-pa-md">
                 <q-table
                   title="Lista de Errores Obtenidos"
@@ -57,7 +61,7 @@
               </q-list>
             </q-tab-panel>
 
-            <q-tab-panel name="tabla_de_simbolos" v-if="entornos.length > 0">
+            <q-tab-panel name="tabla_de_simbolos" v-if="entornos != null && entornos.length > 0">
               <tabla-simbolos :entornos="entornos" />
             </q-tab-panel>
 
@@ -89,12 +93,13 @@ import { Ejecucion } from "../ejecucion/ejecucion";
 import { Errores } from "../arbol/errores";
 import { Error as InstanciaError } from "../arbol/error";
 import { Entornos } from "../ejecucion/entornos";
+import { EntornoAux } from '../ejecucion/entorno_aux';
 
 export default {
   components: {
     codemirror,
     ast: require("../components/Ast").default,
-    tablaSimbolos: require("../components/TablaSimbolos").default
+    tablaSimbolos: require("../components/TablaSimbolos").default,
   },
   data() {
     return {
@@ -124,7 +129,7 @@ export default {
           align: "left",
         },
       ],
-      entornos: []
+      entornos: [],
     };
   },
   methods: {
@@ -145,7 +150,7 @@ export default {
         ],
       });
     },
-    analizar() {
+    traducir() {
       if (this.code.trim() == "") {
         this.notificar("primary", `Ingrese algo de código, por favor`);
         return;
@@ -163,14 +168,15 @@ export default {
         }
         let traduccion = new Traduccion(raizTraduccion);
         this.dot = traduccion.getDot();
-        console.log(traduccion.traducir());
+        const codigoNuevo = traduccion.traducir();
+        Entornos.getInstance().clear();
+        this.code = codigoNuevo;
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
       }
       this.errores = Errores.getInstance().lista;
     },
-    traducir() {},
     ejecutar() {
       if (this.code.trim() == "") {
         this.notificar("primary", `Ingrese algo de código, por favor`);
@@ -202,6 +208,10 @@ export default {
     inicializarValores() {
       Errores.getInstance().clear();
       Entornos.getInstance().clear();
+      this.errores = [];
+      this.entornos = [];
+      this.salida = [];
+      this.dot = '';
     },
     validarError(error) {
       const json = JSON.stringify(error);
@@ -225,6 +235,9 @@ export default {
         );
       }
     },
+    codigoEditado(codigo){
+      this.inicializarValores();
+    }
   },
 };
 </script>

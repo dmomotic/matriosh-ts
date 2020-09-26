@@ -28,32 +28,33 @@ export class Entorno {
     }
 
     //Compruebo en las funciones ya declaradas
-    if (this.deboBuscarEnFunciones(id) && !EntornoAux.getInstance().estoyBuscandoEnFuncion) {
-      EntornoAux.getInstance().estoyBuscandoEnFuncion = true;
-      //Capturo el id de la funcion
-      const id_funcion = this.getIdFuncionABuscar(id);
-      //Si no existe la funcion
-      if (!this.hasFuncion(id_funcion)) {
-        EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
-        return null
-      };
-      //Si existe la funcion voy a ejecutar sus instrucciones
-      const funcion = this.getFuncion(id_funcion);
-      //Hago una copia del entorno actual para que me afecte la ejecucion de las instrucciones de la funcion
-      const copia_entorno = _.cloneDeep(this);
-      //Creo el entorno de la funcion
-      const entorno_fn = new Entorno(copia_entorno);
-      //Ejecuto las instrucciones de la funcion
-      for (let instruccion of funcion.instrucciones) {
-        instruccion.ejecutar(entorno_fn);
-        // Valido si luego de la ejecucion de la instruccion ya existe la variable que busco
-        if (entorno_fn.hasVariable(id)) {
-          EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
-          return entorno_fn.getVariable(id);
-        }
-      }
-      EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
-    }
+    // if (this.deboBuscarEnFunciones(id) && !EntornoAux.getInstance().estoyBuscandoEnFuncion) {
+    //   EntornoAux.getInstance().estoyBuscandoEnFuncion = true;
+    //   //Capturo el id de la funcion
+    //   const id_funcion = this.getIdFuncionABuscar(id);
+
+    //   //Si no existe la funcion
+    //   if (!this.hasFuncion(id_funcion)) {
+    //     EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
+    //     return null
+    //   };
+    //   //Si existe la funcion voy a ejecutar sus instrucciones
+    //   const funcion = this.getFuncion(id_funcion);
+    //   //Hago una copia del entorno actual para que me afecte la ejecucion de las instrucciones de la funcion
+    //   const copia_entorno = _.cloneDeep(this);
+    //   //Creo el entorno de la funcion
+    //   const entorno_fn = new Entorno(copia_entorno);
+    //   //Ejecuto las instrucciones de la funcion
+    //   for (let instruccion of funcion.instrucciones) {
+    //     instruccion.ejecutar(entorno_fn);
+    //     // Valido si luego de la ejecucion de la instruccion ya existe la variable que busco
+    //     if (entorno_fn.hasVariable(id)) {
+    //       EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
+    //       return entorno_fn.getVariable(id);
+    //     }
+    //   }
+    //   EntornoAux.getInstance().estoyBuscandoEnFuncion = false;
+    // }
     return null;
   }
 

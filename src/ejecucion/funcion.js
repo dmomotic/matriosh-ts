@@ -15,7 +15,8 @@ class Funcion {
         return this.hasParametros() ? this.lista_parametros.length : 0;
     }
     toString() {
-        let salida = `Funcion: ${this.id} - Parametros: ${this.lista_parametros.length} - Return Asignado: ${this.hasReturn() ? 'Si' : 'No'}`;
+        const parametros = this.lista_parametros != null ? this.lista_parametros.length : 0;
+        let salida = `Funcion: ${this.id} - Parametros: ${parametros} - Return Asignado: ${this.hasReturn() ? 'Si' : 'No'}`;
         return salida;
     }
 }

@@ -4,6 +4,7 @@ export class Error {
   descripcion: string;
 
   constructor({ tipo, linea, descripcion }: { tipo: string, linea: string, descripcion: string }) {
-    Object.assign(this, {tipo, linea, descripcion})
+    const valor = +linea + 1;
+    Object.assign(this, {tipo, linea: valor.toString(), descripcion})
   }
 }

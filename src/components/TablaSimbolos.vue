@@ -1,6 +1,6 @@
 <template>
   <div class="bg-grey-10 text-white">
-    <q-list dark bordered separator dense>
+    <q-list dark bordered separator dense v-if="entornos != null">
       <q-item
         v-ripple
         v-for="(entorno, indexEntorno) in entornos"
@@ -33,7 +33,7 @@
             caption
             v-for="(type, indextype) in entorno['types']"
             :key="`tp-${indextype}`"
-            >{{ type }}</q-item-label
+            >{{ type[1].getSalidaBase() }}</q-item-label
           >
         </q-item-section>
       </q-item>
@@ -49,10 +49,6 @@ export default {
       type: Array,
       default: [],
     },
-  },
-  mounted() {
-    for (let item of this.entornos) {
-    }
   },
 };
 </script>

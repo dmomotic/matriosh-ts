@@ -36,11 +36,11 @@ class Type {
         return salida;
     }
     getSalidaBase() {
-        let salida = '{';
+        let salida = `${this.id} = {`;
         let i = 0;
         const size = this.atributos.size - 1;
         for (let [key, value] of this.atributos) {
-            salida += `${key}: `;
+            salida += `${key}`;
             if (i != size) {
                 salida += ', ';
             }

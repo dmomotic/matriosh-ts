@@ -9,6 +9,7 @@ class Traduccion {
         this.codigo = '';
         this.contador = 0;
         this.dot = '';
+        this.declaracionesGlobales = '';
     }
     getDot() {
         this.contador = 0;
@@ -75,6 +76,7 @@ class Traduccion {
                         const id = nodo.hijos[1];
                         const tipo = this.recorrer(nodo.hijos[5], e);
                         //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
                         let codigoAux = `${nodo.hijos[0]} ${id}() : ${tipo} {\n`;
                         //Si no tiene funciones anidadas
                         if (!this.tengoFuncionAnidada(nodo.hijos[7])) {
@@ -83,13 +85,20 @@ class Traduccion {
                         }
                         //Si tiene funcion anidada
                         else {
-                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION_VARIABLE
                             const entorno = new entorno_1.Entorno(e, id);
                             nodo.hijos[7].hijos.forEach((nodoHijo) => {
-                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el recorrido para todas las intrucciones disntitas a DECLARACION_FUNCION y DECLARACION_VARIABLE
+                            nodo.hijos[7].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
+                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[7].hijos.forEach((nodoHijo) => {
@@ -98,7 +107,7 @@ class Traduccion {
                                 }
                             });
                         }
-                        return codigoAux;
+                        return temporal + '\n' + codigoAux;
                     }
                 // function id par_izq par_der llave_izq INSTRUCCIONES llave_der
                 case 7:
@@ -106,6 +115,7 @@ class Traduccion {
                     {
                         const id = nodo.hijos[1];
                         //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
                         let codigoAux = `${nodo.hijos[0]} ${id}(){\n`;
                         //Si no tiene funciones anidadas
                         if (!this.tengoFuncionAnidada(nodo.hijos[5])) {
@@ -114,13 +124,20 @@ class Traduccion {
                         }
                         //Si tiene funcion anidada
                         else {
-                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION DE VARIABLE
                             const entorno = new entorno_1.Entorno(e, id);
                             nodo.hijos[5].hijos.forEach((nodoHijo) => {
-                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            nodo.hijos[5].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
+                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[5].hijos.forEach((nodoHijo) => {
@@ -129,7 +146,7 @@ class Traduccion {
                                 }
                             });
                         }
-                        return codigoAux;
+                        return temporal + '\n' + codigoAux;
                     }
                 // function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
                 case 10:
@@ -556,7 +573,7 @@ class Traduccion {
                     declaraciones.forEach((declaracion, index) => {
                         const id = declaracion['id'];
                         //{id}
-                        if (declaracion['id'] && !declaracion['tipo'] && !declaracion['corchetes'] && !declaracion['exp']) {
+                        if (declaracion['id'] && declaracion['tipo'] == null && !declaracion['corchetes'] && !declaracion['exp']) {
                             const tipo = 4 /* SIN_ASIGNAR */;
                             const variable = new variable_1.Variable({ id, tipo, reasignable });
                             //Si estoy en en entorno generado por una funcion
@@ -567,7 +584,7 @@ class Traduccion {
                             codigoAux += `${variable.getIdNuevo()}`;
                         }
                         //{id, tipo}
-                        if (declaracion['id'] && declaracion['tipo'] && !declaracion['corchetes'] && !declaracion['exp']) {
+                        if (declaracion['id'] && declaracion['tipo'] != null && !declaracion['corchetes'] && !declaracion['exp']) {
                             const tipo = declaracion['tipo'];
                             const variable = new variable_1.Variable({ id, tipo: this.getTipo(tipo, e), reasignable });
                             //Si estoy en en entorno generado por una funcion
@@ -578,7 +595,7 @@ class Traduccion {
                             codigoAux += `${variable.getIdNuevo()} : ${tipo}`;
                         }
                         //{id, exp}
-                        if (declaracion['id'] && declaracion['exp'] && !declaracion['tipo'] && !declaracion['corchetes']) {
+                        if (declaracion['id'] && declaracion['exp'] && declaracion['tipo'] == null && !declaracion['corchetes']) {
                             //TODO: ASIGNAR EL TIPO BASADO EN LA EXPRESION
                             const tipo = 4 /* SIN_ASIGNAR */;
                             const variable = new variable_1.Variable({ id, tipo, reasignable });
@@ -590,7 +607,7 @@ class Traduccion {
                             codigoAux += `${variable.getIdNuevo()} = ${declaracion['exp']}`;
                         }
                         //{id, tipo, exp}
-                        if (declaracion['id'] && declaracion['tipo'] && declaracion['exp'] && !declaracion['corchetes']) {
+                        if (declaracion['id'] && declaracion['tipo'] != null && declaracion['exp'] && !declaracion['corchetes']) {
                             const tipo = declaracion['tipo'];
                             //TODO: Validar que el tipo asignado y el tipo de la exp sean iguales
                             const variable = new variable_1.Variable({ id, tipo: this.getTipo(tipo, e), reasignable });
@@ -602,7 +619,7 @@ class Traduccion {
                             codigoAux += `${variable.getIdNuevo()} : ${tipo} = ${declaracion['exp']}`;
                         }
                         //{id, tipo, corchetes}
-                        if (declaracion['id'] && declaracion['tipo'] && !declaracion['exp'] && declaracion['corchetes']) {
+                        if (declaracion['id'] && declaracion['tipo'] != null && !declaracion['exp'] && declaracion['corchetes']) {
                             const tipo = declaracion['tipo'];
                             const corchetes = declaracion['corchetes'];
                             const variable = new variable_1.Variable({ id, tipo: this.getTipo(tipo, e), reasignable });
@@ -614,7 +631,7 @@ class Traduccion {
                             codigoAux += `${variable.getIdNuevo()} : ${tipo}${corchetes}`;
                         }
                         //{id, tipo, corchetes, exp}
-                        if (declaracion['id'] && declaracion['tipo'] && declaracion['exp'] && declaracion['corchetes']) {
+                        if (declaracion['id'] && declaracion['tipo'] != null && declaracion['exp'] && declaracion['corchetes']) {
                             const tipo = declaracion['tipo'];
                             const corchetes = declaracion['corchetes'];
                             //TODO: VALIDAR EL TIPO CON LA EXP ASIGNADA

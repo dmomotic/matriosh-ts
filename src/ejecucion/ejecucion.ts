@@ -116,7 +116,6 @@ export class Ejecucion {
       //Entorno global, limpieza de errores y limpieza de la salida
       const entorno = new Entorno();
       Salida.getInstance().clear();
-
       instrucciones.forEach(element => {
         if (element instanceof Instruccion) {
           try {
@@ -675,7 +674,7 @@ export class Ejecucion {
         case 8: {
           const id = nodo.hijos[1];
           const lista_parametros = this.recorrer(nodo.hijos[3]);
-          const instrucciones = this.recorrer(6);
+          const instrucciones = this.recorrer(nodo.hijos[6]);
           return new DeclaracionFuncion(nodo.linea, id, instrucciones, TIPO_DATO.VOID, lista_parametros);
         }
         //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
@@ -827,13 +826,13 @@ export class Ejecucion {
           return new InstruccionIf(nodo.linea, [inst]);
         case 2:
           //IF ELSE
-          if (this.soyNodo('IF', nodo.hijos[0] && this.soyNodo('ELSE', nodo.hijos[1]))) {
+          if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('ELSE', nodo.hijos[1])) {
             const inst_if = this.recorrer(nodo.hijos[0]);
             const inst_else = this.recorrer(nodo.hijos[1]);
             return new InstruccionIf(nodo.linea, [inst_if, inst_else]);
           }
           //IF LISTA_ELSE_IF
-          if (this.soyNodo('IF', nodo.hijos[0] && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1]))) {
+          if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1])) {
             const inst_if = this.recorrer(nodo.hijos[0]);
             const lista_ifs = this.recorrer(nodo.hijos[1]);
             return new InstruccionIf(nodo.linea, [inst_if, ...lista_ifs]);

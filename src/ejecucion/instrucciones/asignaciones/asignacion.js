@@ -27,7 +27,9 @@ class Asignacion extends instruccion_1.Instruccion {
         valor = _.cloneDeep(valor);
         //Si no tiene tipo asignado le asigno lo que venga
         if (!variable.hasTipoAsignado()) {
-            variable.tipo_asignado = tipo_1.getTipo(valor);
+            if (valor != null) {
+                variable.tipo_asignado = tipo_1.getTipo(valor);
+            }
         }
         //Si tiene tipo asignado
         else {

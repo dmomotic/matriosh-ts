@@ -33,7 +33,9 @@ export class Asignacion extends Instruccion {
 
     //Si no tiene tipo asignado le asigno lo que venga
     if (!variable.hasTipoAsignado()) {
-      variable.tipo_asignado = getTipo(valor);
+      if(valor != null){
+        variable.tipo_asignado = getTipo(valor);
+      }
     }
     //Si tiene tipo asignado
     else {
