@@ -151,13 +151,29 @@ export class Ejecucion {
     //INSTRUCCIONES
     if (this.soyNodo('INSTRUCCIONES', nodo)) {
       let instrucciones = [];
+      //Realizo el primer recorrido para las declaraciones
       nodo.hijos.forEach((nodoHijo: any) => {
-        const inst = this.recorrer(nodoHijo);
-        if (inst instanceof Array) {
-          instrucciones = instrucciones.concat(inst);
+        if (this.soyNodo('DECLARACION_VARIABLE', nodoHijo) || this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+          const inst = this.recorrer(nodoHijo);
+          if (inst instanceof Array) {
+            instrucciones = instrucciones.concat(inst);
+          }
+          else {
+            instrucciones.push(inst);
+          }
         }
-        else {
-          instrucciones.push(inst);
+      });
+
+      //Recorro las demas instrucciones
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if (!this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && !this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+          const inst = this.recorrer(nodoHijo);
+          if (inst instanceof Array) {
+            instrucciones = instrucciones.concat(inst);
+          }
+          else {
+            instrucciones.push(inst);
+          }
         }
       });
       return instrucciones;
@@ -975,7 +991,7 @@ export class Ejecucion {
     if (this.soyNodo('LISTA_PARAMETROS', nodo)) {
       const variables = [];
       nodo.hijos.forEach((nodoHijo: any) => {
-        if(nodoHijo instanceof Object){
+        if (nodoHijo instanceof Object) {
           const resp = this.recorrer(nodoHijo);
           if (resp instanceof Variable) {
             variables.push(resp);
@@ -986,7 +1002,7 @@ export class Ejecucion {
     }
 
     //TERNARIO
-    if(this.soyNodo('TERNARIO', nodo)){
+    if (this.soyNodo('TERNARIO', nodo)) {
       //EXP interrogacion EXP dos_puntos EXP
       const condicion = this.recorrer(nodo.hijos[0]);
       const exp_true = this.recorrer(nodo.hijos[2]);
@@ -995,7 +1011,7 @@ export class Ejecucion {
     }
 
     //SWITCH
-    if(this.soyNodo('SWITCH', nodo)){
+    if (this.soyNodo('SWITCH', nodo)) {
       //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
       const exp = this.recorrer(nodo.hijos[2]);
       const lista_case = this.recorrer(nodo.hijos[5]);
@@ -1003,7 +1019,7 @@ export class Ejecucion {
     }
 
     //CASE
-    if(this.soyNodo('CASE', nodo)){
+    if (this.soyNodo('CASE', nodo)) {
       //case EXP dos_puntos INSTRUCCIONES
       const exp = this.recorrer(nodo.hijos[1]);
       const instrucciones = this.recorrer(nodo.hijos[3]);
@@ -1011,19 +1027,19 @@ export class Ejecucion {
     }
 
     //DEFAULT
-    if(this.soyNodo('DEFAULT', nodo)){
+    if (this.soyNodo('DEFAULT', nodo)) {
       //default dos_puntos INSTRUCCIONES
       const instrucciones = this.recorrer(nodo.hijos[2]);
       return new Case(null, instrucciones, true);
     }
 
     //LISTA_CASE
-    if(this.soyNodo('LISTA_CASE', nodo)){
+    if (this.soyNodo('LISTA_CASE', nodo)) {
       const lista = [];
       nodo.hijos.forEach((nodoHijo: any) => {
-        if(nodoHijo instanceof Object){
+        if (nodoHijo instanceof Object) {
           const resp = this.recorrer(nodoHijo);
-          if(resp instanceof Case){
+          if (resp instanceof Case) {
             lista.push(resp);
           }
         }
@@ -1032,7 +1048,7 @@ export class Ejecucion {
     }
 
     //GRAFICAR_TS
-    if(this.soyNodo('GRAFICAR_TS', nodo)){
+    if (this.soyNodo('GRAFICAR_TS', nodo)) {
       //graficar_ts par_izq par_der punto_coma
       return new GraficarTS(nodo.linea);
     }

@@ -131,7 +131,7 @@ class Traduccion {
                                     temporal += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
-                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            //Realizo el recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
                             nodo.hijos[5].hijos.forEach((nodoHijo) => {
                                 if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
@@ -156,6 +156,7 @@ class Traduccion {
                         const lista_parametros = this.recorrer(nodo.hijos[3], e);
                         const tipo = this.recorrer(nodo.hijos[6], e);
                         //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
                         let codigoAux = `${nodo.hijos[0]} ${id}(${lista_parametros}) : ${tipo} {\n`;
                         //Si no tiene funciones anidadas
                         if (!this.tengoFuncionAnidada(nodo.hijos[8])) {
@@ -164,13 +165,20 @@ class Traduccion {
                         }
                         //Si tiene funcion anidada
                         else {
-                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION_VARIABLE
                             const entorno = new entorno_1.Entorno(e, id);
                             nodo.hijos[8].hijos.forEach((nodoHijo) => {
-                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            nodo.hijos[8].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
+                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[8].hijos.forEach((nodoHijo) => {
@@ -179,7 +187,7 @@ class Traduccion {
                                 }
                             });
                         }
-                        return codigoAux;
+                        return temporal + '\n' + codigoAux;
                     }
                 // function id par_izq LISTA_PARAMETROS par_der llave_izq INSTRUCCIONES llave_der
                 case 8:
@@ -188,6 +196,7 @@ class Traduccion {
                         const id = nodo.hijos[1];
                         const lista_parametros = this.recorrer(nodo.hijos[3], e);
                         //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
                         let codigoAux = `${nodo.hijos[0]} ${id}(${lista_parametros}){\n`;
                         //Si no tiene funciones anidadas
                         if (!this.tengoFuncionAnidada(nodo.hijos[6])) {
@@ -196,13 +205,20 @@ class Traduccion {
                         }
                         //Si tiene funcion anidada
                         else {
-                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION_VARIABLE
                             const entorno = new entorno_1.Entorno(e, id);
                             nodo.hijos[6].hijos.forEach((nodoHijo) => {
-                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            nodo.hijos[6].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
+                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[6].hijos.forEach((nodoHijo) => {
@@ -211,7 +227,7 @@ class Traduccion {
                                 }
                             });
                         }
-                        return codigoAux;
+                        return temporal + '\n' + codigoAux;
                     }
             }
         }

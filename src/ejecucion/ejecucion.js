@@ -139,13 +139,28 @@ class Ejecucion {
         //INSTRUCCIONES
         if (this.soyNodo('INSTRUCCIONES', nodo)) {
             let instrucciones = [];
+            //Realizo el primer recorrido para las declaraciones
             nodo.hijos.forEach((nodoHijo) => {
-                const inst = this.recorrer(nodoHijo);
-                if (inst instanceof Array) {
-                    instrucciones = instrucciones.concat(inst);
+                if (this.soyNodo('DECLARACION_VARIABLE', nodoHijo) || this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+                    const inst = this.recorrer(nodoHijo);
+                    if (inst instanceof Array) {
+                        instrucciones = instrucciones.concat(inst);
+                    }
+                    else {
+                        instrucciones.push(inst);
+                    }
                 }
-                else {
-                    instrucciones.push(inst);
+            });
+            //Recorro las demas instrucciones
+            nodo.hijos.forEach((nodoHijo) => {
+                if (!this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && !this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+                    const inst = this.recorrer(nodoHijo);
+                    if (inst instanceof Array) {
+                        instrucciones = instrucciones.concat(inst);
+                    }
+                    else {
+                        instrucciones.push(inst);
+                    }
                 }
             });
             return instrucciones;
