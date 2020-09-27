@@ -7,6 +7,7 @@ const instruccion_1 = require("../../instruccion");
 const tipo_1 = require("../../tipo");
 const variable_1 = require("../../variable");
 const _ = require("lodash");
+const entorno_aux_1 = require("../../entorno_aux");
 class DecIdExp extends instruccion_1.Instruccion {
     constructor(linea, reasignable, id, exp) {
         super(linea);
@@ -15,7 +16,7 @@ class DecIdExp extends instruccion_1.Instruccion {
     ejecutar(e) {
         //Validacion de variable existente
         let variable = e.getVariable(this.id);
-        if (variable) {
+        if (variable && !entorno_aux_1.EntornoAux.getInstance().estoyEjecutandoFuncion()) {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Ya existe una variable declarada con el id ${this.id}` }));
             return;
         }

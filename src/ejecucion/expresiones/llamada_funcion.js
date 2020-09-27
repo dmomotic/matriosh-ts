@@ -10,6 +10,7 @@ const _ = require("lodash");
 const tipo_1 = require("../tipo");
 const continue_1 = require("../continue");
 const break_1 = require("../break");
+const entorno_aux_1 = require("../entorno_aux");
 class LlamadaFuncion extends instruccion_1.Instruccion {
     constructor(linea, id, lista_parametros = null) {
         super(linea);
@@ -42,7 +43,7 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
                 const variable = funcion.lista_parametros[i];
                 const valor = exp.ejecutar(entorno_local);
                 //Validacion de tipo a asignar
-                if (variable.hasTipoAsignado() && variable.tipo_asignado != tipo_1.getTipo(valor)) {
+                if (valor != null && variable.hasTipoAsignado() && variable.tipo_asignado != tipo_1.getTipo(valor)) {
                     errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El parametro ${variable.id} de la funcion ${this.id} no es del tipo enviado en la llamada de la funcion` }));
                     return;
                 }
@@ -59,6 +60,7 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
             }
         }
         entorno_local.variables = entorno_aux.variables;
+        entorno_aux_1.EntornoAux.getInstance().inicioEjecucionFuncion();
         //Ejecuto las instrucciones
         for (let instruccion of funcion.instrucciones) {
             const resp = instruccion.ejecutar(entorno_local);
@@ -69,34 +71,42 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
                     //Valido el tipo del retorno
                     if (resp.getValue() != null && tipo_1.getTipo(resp.getValue()) != funcion.tipo_return) {
                         errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} esta retornando un tipo distinto al declarado` }));
+                        entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                         return;
                     }
+                    entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                     return resp.getValue();
                 }
                 //Si la funcion tiene return pero el return no trae valor
                 if (funcion.hasReturn() && !resp.hasValue()) {
                     errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+                    entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                     return;
                 }
                 //Si la funcion no debe tener return y el return trae un valor
                 if (!funcion.hasReturn() && resp.hasValue()) {
                     errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} no debe retornar un valor` }));
+                    entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                     return;
                 }
                 //Si solo es un return
+                entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                 return;
             }
             //Validacion Break o Continue
             if (resp instanceof break_1.Break || resp instanceof continue_1.Continue) {
                 errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Las instrucciones Break/Continue solo pueden ser utilizadas dentro de ciclos` }));
+                entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
                 return;
             }
         }
         //Valido si la funcion debia retornar algo
         if (funcion.hasReturn()) {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+            entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
             return;
         }
+        entorno_aux_1.EntornoAux.getInstance().finEjecucionFuncion();
     }
 }
 exports.LlamadaFuncion = LlamadaFuncion;

@@ -5,6 +5,7 @@ import { Instruccion } from "../../instruccion";
 import { getTipo } from "../../tipo";
 import { Variable } from "../../variable";
 import * as _ from 'lodash';
+import { EntornoAux } from "../../entorno_aux";
 
 export class DecIdExp extends Instruccion{
   reasignable: boolean;
@@ -19,7 +20,7 @@ export class DecIdExp extends Instruccion{
   ejecutar(e: Entorno) {
     //Validacion de variable existente
     let variable = e.getVariable(this.id);
-    if(variable){
+    if(variable && !EntornoAux.getInstance().estoyEjecutandoFuncion()){
       Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Ya existe una variable declarada con el id ${this.id}`}));
       return ;
     }

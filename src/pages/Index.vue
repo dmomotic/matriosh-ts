@@ -4,6 +4,7 @@
       <div class="col-12">
         <q-btn-group push spread>
           <q-btn push label="Traducir" icon="transform" @click="traducir" />
+          <q-btn push label="Limpiar" icon="cleaning_services" @click="limpiar" />
           <q-btn push label="Ejecutar" icon="play_arrow" @click="ejecutar" />
         </q-btn-group>
       </div>
@@ -116,7 +117,6 @@ export default {
       output: "salida de ejemplo",
       tab: "editor",
       dot: "",
-      contadorDot: 0,
       salida: [],
       errores: [],
       columns: [
@@ -236,6 +236,10 @@ export default {
       }
     },
     codigoEditado(codigo){
+      this.inicializarValores();
+    },
+    limpiar(){
+      this.code = '';
       this.inicializarValores();
     }
   },

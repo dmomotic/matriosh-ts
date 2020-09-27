@@ -2,6 +2,7 @@ import { Error } from "../../arbol/error";
 import { Errores } from "../../arbol/errores";
 import { Entorno } from "../entorno";
 import { Instruccion } from "../instruccion";
+import * as _ from 'lodash';
 
 export class Id extends Instruccion{
   id: string;

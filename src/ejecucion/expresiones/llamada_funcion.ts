@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { getTipo } from "../tipo";
 import { Continue } from "../continue";
 import { Break } from "../break";
+import { EntornoAux } from "../entorno_aux";
 
 export class LlamadaFuncion extends Instruccion {
   id: string;
@@ -49,7 +50,7 @@ export class LlamadaFuncion extends Instruccion {
         const valor = exp.ejecutar(entorno_local);
 
         //Validacion de tipo a asignar
-        if(variable.hasTipoAsignado() && variable.tipo_asignado != getTipo(valor)){
+        if(valor != null && variable.hasTipoAsignado() && variable.tipo_asignado != getTipo(valor)){
           Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `El parametro ${variable.id} de la funcion ${this.id} no es del tipo enviado en la llamada de la funcion`}));
           return;
         }
@@ -69,6 +70,8 @@ export class LlamadaFuncion extends Instruccion {
 
     entorno_local.variables = entorno_aux.variables;
 
+    EntornoAux.getInstance().inicioEjecucionFuncion();
+
     //Ejecuto las instrucciones
     for (let instruccion of funcion.instrucciones) {
       const resp = instruccion.ejecutar(entorno_local);
@@ -80,26 +83,32 @@ export class LlamadaFuncion extends Instruccion {
           //Valido el tipo del retorno
           if(resp.getValue() != null && getTipo(resp.getValue()) != funcion.tipo_return){
             Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} esta retornando un tipo distinto al declarado`}));
+            EntornoAux.getInstance().finEjecucionFuncion();
             return;
           }
+          EntornoAux.getInstance().finEjecucionFuncion();
           return resp.getValue();
         }
         //Si la funcion tiene return pero el return no trae valor
         if (funcion.hasReturn() && !resp.hasValue()) {
           Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor` }));
+          EntornoAux.getInstance().finEjecucionFuncion();
           return;
         }
         //Si la funcion no debe tener return y el return trae un valor
         if(!funcion.hasReturn() && resp.hasValue()){
           Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} no debe retornar un valor` }));
+          EntornoAux.getInstance().finEjecucionFuncion();
           return;
         }
         //Si solo es un return
+        EntornoAux.getInstance().finEjecucionFuncion();
         return;
       }
       //Validacion Break o Continue
       if(resp instanceof Break || resp instanceof Continue){
         Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Las instrucciones Break/Continue solo pueden ser utilizadas dentro de ciclos`}));
+        EntornoAux.getInstance().finEjecucionFuncion();
         return;
       }
     }
@@ -107,8 +116,11 @@ export class LlamadaFuncion extends Instruccion {
     //Valido si la funcion debia retornar algo
     if(funcion.hasReturn()){
       Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} debe retornar un valor`}));
+      EntornoAux.getInstance().finEjecucionFuncion();
       return;
     }
+
+    EntornoAux.getInstance().finEjecucionFuncion();
   }
 
 }

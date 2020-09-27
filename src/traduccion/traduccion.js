@@ -1055,6 +1055,16 @@ class Traduccion {
             });
             return codigoAux;
         }
+        //INCREMENTO_DECREMENTO
+        else if (this.soyNodo('INCREMENTO_DECREMENTO', nodo)) {
+            //id mas_mas punto_coma || id menos_menos punto_coma
+            const id = nodo.hijos[0];
+            const variable = e.getVariable(id);
+            if (variable) {
+                return `${variable.getIdNuevo()} ${nodo.hijos[1]};`;
+            }
+            return `${id} ${nodo.hijos[1]};`;
+        }
         return '';
     }
     /**

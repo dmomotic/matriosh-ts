@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DecIdTipoExp = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
+const entorno_aux_1 = require("../../entorno_aux");
 const instruccion_1 = require("../../instruccion");
 const tipo_1 = require("../../tipo");
 const variable_1 = require("../../variable");
@@ -14,7 +15,7 @@ class DecIdTipoExp extends instruccion_1.Instruccion {
     ejecutar(e) {
         //Validacion de variable existente
         let variable = e.getVariable(this.id);
-        if (variable) {
+        if (variable && !entorno_aux_1.EntornoAux.getInstance().estoyEjecutandoFuncion()) {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Ya existe una variable con el nombre ${this.id} declarada en este entorno` }));
             return;
         }

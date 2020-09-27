@@ -65,6 +65,7 @@ import { Case } from './case';
 import { Switch } from './expresiones/condicionales/switch';
 import { Entornos } from './entornos';
 import { GraficarTS } from './instrucciones/graficar_ts';
+import { IncrementoDecremento } from './instrucciones/incremento_decremento';
 
 export class Ejecucion {
   raiz: Object;
@@ -153,7 +154,7 @@ export class Ejecucion {
       let instrucciones = [];
       //Realizo el primer recorrido para las declaraciones
       nodo.hijos.forEach((nodoHijo: any) => {
-        if (this.soyNodo('DECLARACION_VARIABLE', nodoHijo) || this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+        if (/* this.soyNodo('DECLARACION_VARIABLE', nodoHijo) ||  */this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
           const inst = this.recorrer(nodoHijo);
           if (inst instanceof Array) {
             instrucciones = instrucciones.concat(inst);
@@ -166,7 +167,7 @@ export class Ejecucion {
 
       //Recorro las demas instrucciones
       nodo.hijos.forEach((nodoHijo: any) => {
-        if (!this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && !this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+        if (/* !this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && */ !this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
           const inst = this.recorrer(nodoHijo);
           if (inst instanceof Array) {
             instrucciones = instrucciones.concat(inst);
@@ -1051,6 +1052,14 @@ export class Ejecucion {
     if (this.soyNodo('GRAFICAR_TS', nodo)) {
       //graficar_ts par_izq par_der punto_coma
       return new GraficarTS(nodo.linea);
+    }
+
+    //INCREMENTO_DECREMENTO
+    if(this.soyNodo('INCREMENTO_DECREMENTO', nodo)){
+      //id mas_mas punto_coma || id menos_menos punto_coma
+      const id = nodo.hijos[0];
+      const incremento = nodo.hijos[1] == '++';
+      return new IncrementoDecremento(nodo.linea, id, incremento);
     }
   }
 

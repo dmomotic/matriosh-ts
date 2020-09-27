@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DecId = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
+const entorno_aux_1 = require("../../entorno_aux");
 const instruccion_1 = require("../../instruccion");
 const variable_1 = require("../../variable");
 class DecId extends instruccion_1.Instruccion {
@@ -13,7 +14,7 @@ class DecId extends instruccion_1.Instruccion {
     ejecutar(e) {
         //Validacion de variabl existente
         let variable = e.getVariable(this.id);
-        if (variable) {
+        if (variable && !entorno_aux_1.EntornoAux.getInstance().estoyEjecutandoFuncion()) {
             errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El id: ${this.id} ya fue declarado en este entorno` }));
             return;
         }

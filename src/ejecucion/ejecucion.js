@@ -66,6 +66,7 @@ const case_1 = require("./case");
 const switch_1 = require("./expresiones/condicionales/switch");
 const entornos_1 = require("./entornos");
 const graficar_ts_1 = require("./instrucciones/graficar_ts");
+const incremento_decremento_1 = require("./instrucciones/incremento_decremento");
 class Ejecucion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -141,7 +142,7 @@ class Ejecucion {
             let instrucciones = [];
             //Realizo el primer recorrido para las declaraciones
             nodo.hijos.forEach((nodoHijo) => {
-                if (this.soyNodo('DECLARACION_VARIABLE', nodoHijo) || this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+                if ( /* this.soyNodo('DECLARACION_VARIABLE', nodoHijo) ||  */this.soyNodo('DECLARACION_FUNCION', nodoHijo) || this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
                     const inst = this.recorrer(nodoHijo);
                     if (inst instanceof Array) {
                         instrucciones = instrucciones.concat(inst);
@@ -153,7 +154,7 @@ class Ejecucion {
             });
             //Recorro las demas instrucciones
             nodo.hijos.forEach((nodoHijo) => {
-                if (!this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && !this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
+                if ( /* !this.soyNodo('DECLARACION_VARIABLE', nodoHijo) && */!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_TYPE', nodoHijo)) {
                     const inst = this.recorrer(nodoHijo);
                     if (inst instanceof Array) {
                         instrucciones = instrucciones.concat(inst);
@@ -979,6 +980,13 @@ class Ejecucion {
         if (this.soyNodo('GRAFICAR_TS', nodo)) {
             //graficar_ts par_izq par_der punto_coma
             return new graficar_ts_1.GraficarTS(nodo.linea);
+        }
+        //INCREMENTO_DECREMENTO
+        if (this.soyNodo('INCREMENTO_DECREMENTO', nodo)) {
+            //id mas_mas punto_coma || id menos_menos punto_coma
+            const id = nodo.hijos[0];
+            const incremento = nodo.hijos[1] == '++';
+            return new incremento_decremento_1.IncrementoDecremento(nodo.linea, id, incremento);
         }
     }
     /**

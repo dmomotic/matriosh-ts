@@ -1,6 +1,7 @@
 import { Error } from "../../../arbol/error";
 import { Errores } from "../../../arbol/errores";
 import { Entorno } from "../../entorno";
+import { EntornoAux } from "../../entorno_aux";
 import { Instruccion } from "../../instruccion";
 import { getTipo, TIPO_DATO } from '../../tipo';
 import { Variable } from "../../variable";
@@ -22,7 +23,7 @@ export class DecIdTipoCorchetesExp extends Instruccion{
   ejecutar(e: Entorno) {
     //Validacion de variable existente
     let variable = e.getVariable(this.id);
-    if(variable){
+    if(variable && !EntornoAux.getInstance().estoyEjecutandoFuncion()){
       Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `La variable ${this.id} ya ha sido declarada`}));
       return;
     }

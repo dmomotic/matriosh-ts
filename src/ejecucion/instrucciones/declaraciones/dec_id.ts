@@ -1,6 +1,7 @@
 import { Error } from "../../../arbol/error";
 import { Errores } from "../../../arbol/errores";
 import { Entorno } from "../../entorno";
+import { EntornoAux } from "../../entorno_aux";
 import { Instruccion } from "../../instruccion";
 import { Variable } from "../../variable";
 
@@ -16,7 +17,7 @@ export class DecId extends Instruccion{
   ejecutar(e: Entorno) {
     //Validacion de variabl existente
     let variable = e.getVariable(this.id);
-    if(variable){
+    if(variable && !EntornoAux.getInstance().estoyEjecutandoFuncion()){
       Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `El id: ${this.id} ya fue declarado en este entorno`}));
       return;
     }
