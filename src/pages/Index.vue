@@ -195,6 +195,11 @@ export default {
         }
         let ejecucion = new Ejecucion(raiz);
         this.dot = ejecucion.getDot();
+        //Valido si puedo ejecutar (no deben existir funciones anidadas)
+        if(!ejecucion.puedoEjecutar(raiz)){
+          this.notificar("primary", "No se puede realizar una ejecución con funciones anidadas");
+          return;
+        }
         ejecucion.ejecutar();
         // ejecucion.imprimirErrores();
         this.salida = ejecucion.getSalida();

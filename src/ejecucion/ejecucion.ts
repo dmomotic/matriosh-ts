@@ -1055,12 +1055,54 @@ export class Ejecucion {
     }
 
     //INCREMENTO_DECREMENTO
-    if(this.soyNodo('INCREMENTO_DECREMENTO', nodo)){
+    if (this.soyNodo('INCREMENTO_DECREMENTO', nodo)) {
       //id mas_mas punto_coma || id menos_menos punto_coma
       const id = nodo.hijos[0];
       const incremento = nodo.hijos[1] == '++';
       return new IncrementoDecremento(nodo.linea, id, incremento);
     }
+  }
+
+  /**
+   * Funcion para determinar si no tengo funciones anidadas
+   * @param nodo
+   */
+  puedoEjecutar(nodo: any): boolean {
+
+    //S
+    if (this.soyNodo('S', nodo)) {
+      for (let nodoHijo of nodo.hijos) {
+        const resp = this.puedoEjecutar(nodoHijo);
+        if (!resp) return false;
+      }
+    }
+
+    //INSTRUCCIONES
+    if (this.soyNodo('INSTRUCCIONES', nodo)) {
+      for (let nodoHijo of nodo.hijos) {
+        //Ejecuto solo los nodos que sean DECLARACION_FUNCION
+        if (this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+          const res = this.puedoEjecutar(nodoHijo);
+          if (!res) return false;
+        }
+      }
+    }
+
+    //DECLARACION_FUNCION
+    if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
+      for (let nodoHijo of nodo.hijos) {
+        //Si es el nodo INSTRUCCIONES
+        if (this.soyNodo('INSTRUCCIONES', nodoHijo)) {
+          for (let nodoInst of nodoHijo.hijos) {
+            if (this.soyNodo('DECLARACION_FUNCION', nodoInst)) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   /**

@@ -990,6 +990,45 @@ class Ejecucion {
         }
     }
     /**
+     * Funcion para determinar si no tengo funciones anidadas
+     * @param nodo
+     */
+    puedoEjecutar(nodo) {
+        //S
+        if (this.soyNodo('S', nodo)) {
+            for (let nodoHijo of nodo.hijos) {
+                const resp = this.puedoEjecutar(nodoHijo);
+                if (!resp)
+                    return false;
+            }
+        }
+        //INSTRUCCIONES
+        if (this.soyNodo('INSTRUCCIONES', nodo)) {
+            for (let nodoHijo of nodo.hijos) {
+                //Ejecuto solo los nodos que sean DECLARACION_FUNCION
+                if (this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                    const res = this.puedoEjecutar(nodoHijo);
+                    if (!res)
+                        return false;
+                }
+            }
+        }
+        //DECLARACION_FUNCION
+        if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
+            for (let nodoHijo of nodo.hijos) {
+                //Si es el nodo INSTRUCCIONES
+                if (this.soyNodo('INSTRUCCIONES', nodoHijo)) {
+                    for (let nodoInst of nodoHijo.hijos) {
+                        if (this.soyNodo('DECLARACION_FUNCION', nodoInst)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    /**
      * Funcion para determinar en que tipo de nodo estoy
      * @param label
      * @param nodo
