@@ -39,8 +39,12 @@ class AsignacionArreglo extends instruccion_1.Instruccion {
             if (res instanceof arreglo_1.Arreglo) {
                 //Reviso si el arreglo tiene el indice que buscamos
                 if (!res.hasIndex(index)) {
-                    errores_1.Errores.getInstance().push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El arreglo no tiene un indice ${index}` }));
-                    return;
+                    /**
+                     * Comente esta seccion porque si el arreglo no tiene el indice le debo asignar el valor
+                     * de igual forma segun los requerimientos del lenguaje
+                     */
+                    // Errores.getInstance().push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `El arreglo no tiene un indice ${index}` }));
+                    // return;
                 }
                 //Si ya es el ultimo acceso
                 if (i == this.lista_accesos.length - 1) {

@@ -304,6 +304,7 @@ PARAMETRO /*-->TR - EJ<--*/
 
 DECLARACION_TYPE /*-->TR - EJ<--*/
   : type id igual llave_izq LISTA_ATRIBUTOS llave_der { $$ = new NodoAST({label: 'DECLARACION_TYPE', hijos: [$1, $2, $3, $4, $5, $6], linea: yylineno}); }
+  | type id igual llave_izq LISTA_ATRIBUTOS llave_der punto_coma { $$ = new NodoAST({label: 'DECLARACION_TYPE', hijos: [$1, $2, $3, $4, $5, $6, $7], linea: yylineno}); }
 ;
 
 LISTA_ATRIBUTOS /*-->TR -- EJ<--*/

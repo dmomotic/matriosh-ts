@@ -60,6 +60,7 @@ class LlamadaFuncion extends instruccion_1.Instruccion {
             }
         }
         entorno_local.variables = entorno_aux.variables;
+        entorno_local.padre = e.getEntornoGlobal();
         entorno_aux_1.EntornoAux.getInstance().inicioEjecucionFuncion();
         //Ejecuto las instrucciones
         for (let instruccion of funcion.instrucciones) {

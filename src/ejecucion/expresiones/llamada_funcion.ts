@@ -69,6 +69,7 @@ export class LlamadaFuncion extends Instruccion {
     }
 
     entorno_local.variables = entorno_aux.variables;
+    entorno_local.padre = e.getEntornoGlobal();
 
     EntornoAux.getInstance().inicioEjecucionFuncion();
 

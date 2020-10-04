@@ -17,10 +17,10 @@ export class Mayor extends Instruccion{
     const exp2 = this.expDer.ejecutar(e);
 
     //Validacion de errores
-    // if(exp1 == null || exp2 == null){
-    //   Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion mayor que con un operador null`}));
-    //   return;
-    // }
+    if(exp1 == null || exp2 == null){
+      //Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion mayor que con un operador null`}));
+      return false;
+    }
 
     return exp1 > exp2;
 

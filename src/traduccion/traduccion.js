@@ -233,13 +233,15 @@ class Traduccion {
         }
         //DECLARACION_TYPE
         else if (this.soyNodo('DECLARACION_TYPE', nodo)) {
+            const id = nodo.hijos[1];
+            const lista_atributos = this.recorrer(nodo.hijos[4], e);
             switch (nodo.hijos.length) {
                 // type id igual llave_izq LISTA_ATRIBUTOS llave_der
                 case 6:
-                    const id = nodo.hijos[1];
-                    const lista_atributos = this.recorrer(nodo.hijos[4], e);
-                    let codigoAux = `type ${id} = {\n${lista_atributos}\n}\n`;
-                    return codigoAux;
+                    return `type ${id} = {\n${lista_atributos}\n}\n`;
+                // type id igual llave_izq LISTA_ATRIBUTOS llave_der punto_coma
+                case 7:
+                    return `type ${id} = {\n${lista_atributos}\n};\n`;
             }
         }
         //ASIGNACION

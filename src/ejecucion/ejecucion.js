@@ -516,6 +516,7 @@ class Ejecucion {
         //DECLARACION_TYPE
         if (this.soyNodo('DECLARACION_TYPE', nodo)) {
             // type id igual llave_izq LISTA_ATRIBUTOS llave_der
+            // type id igual llave_izq LISTA_ATRIBUTOS llave_der punto_coma
             const id = nodo.hijos[1];
             const lista_atributos = this.recorrer(nodo.hijos[4]);
             //cada atributo = {id, tipo, type_generador?, corchetes?}
