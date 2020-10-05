@@ -98,7 +98,7 @@ class Traduccion {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
-                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
+                            codigoAux += `console.log('');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[7].hijos.forEach((nodoHijo) => {
@@ -137,7 +137,7 @@ class Traduccion {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
-                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
+                            codigoAux += `console.log('');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[5].hijos.forEach((nodoHijo) => {
@@ -150,8 +150,47 @@ class Traduccion {
                     }
                 // function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
                 case 10:
+                    // function test() : TIPO[][] { INSTRUCCIONES }
+                    if (this.soyNodo('LISTA_CORCHETES', nodo.hijos[6])) {
+                        const id = nodo.hijos[1];
+                        const tipo = this.recorrer(nodo.hijos[5], e);
+                        const lista_corchetes = this.recorrer(nodo.hijos[6], e);
+                        //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
+                        let codigoAux = `${nodo.hijos[0]} ${id}() : ${tipo}${lista_corchetes} {\n`;
+                        //Si no tiene funciones anidadas
+                        if (!this.tengoFuncionAnidada(nodo.hijos[8])) {
+                            codigoAux += this.recorrer(nodo.hijos[8], new entorno_1.Entorno(e));
+                            codigoAux += `}\n\n`;
+                        }
+                        //Si tiene funcion anidada
+                        else {
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION_VARIABLE
+                            const entorno = new entorno_1.Entorno(e, id);
+                            nodo.hijos[8].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            nodo.hijos[8].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            codigoAux += `console.log('');\n`;
+                            codigoAux += `}\n\n`;
+                            //Realizo el recorrido para las funciones anidadas
+                            nodo.hijos[8].hijos.forEach((nodoHijo) => {
+                                if (this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                    codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                        }
+                        return temporal + '\n' + codigoAux;
+                    }
                     // function test ( LISTA_PARAMETROS ) : TIPO { INSTRUCCIONES }
-                    {
+                    else if (this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3])) {
                         const id = nodo.hijos[1];
                         const lista_parametros = this.recorrer(nodo.hijos[3], e);
                         const tipo = this.recorrer(nodo.hijos[6], e);
@@ -178,7 +217,7 @@ class Traduccion {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
-                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
+                            codigoAux += `console.log('');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[8].hijos.forEach((nodoHijo) => {
@@ -218,10 +257,51 @@ class Traduccion {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
                             });
-                            codigoAux += `console.log('Esta funcion fue desanidada');\n`;
+                            codigoAux += `console.log('');\n`;
                             codigoAux += `}\n\n`;
                             //Realizo el recorrido para las funciones anidadas
                             nodo.hijos[6].hijos.forEach((nodoHijo) => {
+                                if (this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
+                                    codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                        }
+                        return temporal + '\n' + codigoAux;
+                    }
+                // function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der
+                case 11:
+                    {
+                        const id = nodo.hijos[1];
+                        const lista_parametros = this.recorrer(nodo.hijos[3], e);
+                        const tipo = this.recorrer(nodo.hijos[6], e);
+                        const lista_corchetes = this.recorrer(nodo.hijos[7], e);
+                        //TODO: agregarla a la TS y hacer verificacion de errores
+                        let temporal = '';
+                        let codigoAux = `${nodo.hijos[0]} ${id}(${lista_parametros}) : ${tipo}${lista_corchetes} {\n`;
+                        //Si no tiene funciones anidadas
+                        if (!this.tengoFuncionAnidada(nodo.hijos[9])) {
+                            codigoAux += this.recorrer(nodo.hijos[9], new entorno_1.Entorno(e));
+                            codigoAux += `}\n\n`;
+                        }
+                        //Si tiene funcion anidada
+                        else {
+                            //Realizo el primer recorrido para todas las instrucciones distintas de DECLARACION_FUNCION que sean DECLARACION_VARIABLE
+                            const entorno = new entorno_1.Entorno(e, id);
+                            nodo.hijos[9].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    temporal += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            //Realizo el recorrido para todas las instrucciones distintas de DECLARACION_FUNCION y DECLARACION DE VARIABLE
+                            nodo.hijos[9].hijos.forEach((nodoHijo) => {
+                                if (!this.soyNodo('DECLARACION_FUNCION', nodoHijo) && !this.soyNodo('DECLARACION_VARIABLE', nodoHijo)) {
+                                    codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
+                                }
+                            });
+                            codigoAux += `console.log('');\n`;
+                            codigoAux += `}\n\n`;
+                            //Realizo el recorrido para las funciones anidadas
+                            nodo.hijos[9].hijos.forEach((nodoHijo) => {
                                 if (this.soyNodo('DECLARACION_FUNCION', nodoHijo)) {
                                     codigoAux += this.recorrer(nodoHijo, entorno) + '\n';
                                 }
@@ -1019,15 +1099,23 @@ class Traduccion {
         //PARAMETRO
         else if (this.soyNodo('PARAMETRO', nodo)) {
             const id = nodo.hijos[0];
-            const tipo = this.recorrer(nodo.hijos[2], e);
             switch (nodo.hijos.length) {
                 // id dos_puntos TIPO_VARIABLE_NATIVA
-                case 3:
+                case 3: {
+                    let tipo = this.recorrer(nodo.hijos[2], e);
                     return `${id}: ${tipo}`;
+                }
                 // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
-                case 4:
+                case 4: {
+                    let tipo = this.recorrer(nodo.hijos[2], e);
                     const corchetes = this.recorrer(nodo.hijos[3], e);
                     return `${id} : ${tipo}${corchetes}`;
+                }
+                // id dos_puntos Array menor TIPO_VARIABLE_NATIVA mayor
+                case 6: {
+                    let tipo = this.recorrer(nodo.hijos[4], e);
+                    return `${id} : Array<${tipo}>`;
+                }
             }
         }
         //ATRIBUTO

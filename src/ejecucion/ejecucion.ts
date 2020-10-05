@@ -704,16 +704,34 @@ export class Ejecucion {
           const instrucciones = this.recorrer(nodo.hijos[7]);
           return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return);
         }
-        //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
         case 10: {
+          // function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der
+          if(this.soyNodo('LISTA_CORCHETES', nodo.hijos[6])){
+            const id = nodo.hijos[1];
+            const tipo_return = TIPO_DATO.ARRAY;
+            const instrucciones = this.recorrer(nodo.hijos[8]);
+            return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return);
+          }
+          //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+          else if(this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3])){
+            const id = nodo.hijos[1];
+            //[Variable ...]
+            const lista_parametros = this.recorrer(nodo.hijos[3]);
+
+            // {tipo, type_generador?}
+            const tipo_variable_nativa = this.recorrer(nodo.hijos[6]);
+            const tipo_return = tipo_variable_nativa.tipo;
+            const instrucciones = this.recorrer(nodo.hijos[8]);
+            return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return, lista_parametros);
+          }
+        }
+        // function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der
+        case 11: {
           const id = nodo.hijos[1];
           //[Variable ...]
           const lista_parametros = this.recorrer(nodo.hijos[3]);
-
-          // {tipo, type_generador?}
-          const tipo_variable_nativa = this.recorrer(nodo.hijos[6]);
-          const tipo_return = tipo_variable_nativa.tipo;
-          const instrucciones = this.recorrer(nodo.hijos[8]);
+          const tipo_return = TIPO_DATO.ARRAY;
+          const instrucciones = this.recorrer(nodo.hijos[9]);
           return new DeclaracionFuncion(nodo.linea, id, instrucciones, tipo_return, lista_parametros);
         }
       }
@@ -975,17 +993,31 @@ export class Ejecucion {
     //PARAMETRO
     if (this.soyNodo('PARAMETRO', nodo)) {
       const id = nodo.hijos[0];
-      //{tipo, tpe_generador?}
-      const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
-      const tipo = tipo_variable_nativa.tipo;
+
       switch (nodo.hijos.length) {
         //id dos_puntos TIPO_VARIABLE_NATIVA
-        case 3:
+        case 3: {
+          //{tipo, tpe_generador?}
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+          const tipo = tipo_variable_nativa.tipo;
           return new Variable({ reasignable: true, id, tipo_asignado: tipo });
+        }
+
         //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
-        case 4:
+        case 4: {
+          //{tipo, tpe_generador?}
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+          const tipo = tipo_variable_nativa.tipo;
           const dimensiones = this.recorrer(nodo.hijos[3]);
           return new Variable({ reasignable: true, id, tipo_asignado: TIPO_DATO.ARRAY, dimensiones });
+        }
+        // id dos_puntos Array menor TIPO_VARIABLE_NATIVA mayor
+        case 6: {
+          //{tipo, tpe_generador?}
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[4]);
+          const tipo = tipo_variable_nativa.tipo;
+          return new Variable({ reasignable: true, id, tipo_asignado: TIPO_DATO.ARRAY, dimensiones: 1});
+        }
       }
     }
 

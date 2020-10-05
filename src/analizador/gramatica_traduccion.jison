@@ -40,6 +40,7 @@
 'in' return 'in';
 'of' return 'of';
 'graficar_ts' return 'graficar_ts';
+'Array' return 'Array';
 
 //Signos
 ';' return 'punto_coma';
@@ -278,6 +279,9 @@ DECLARACION_FUNCION /*-->TR - EJ<--*/
   /*-->TR - EJ<--*/
   : function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9], linea: yylineno}); }
 
+   //Funcion sin parametros y con tipo -> function test() : TIPO[][] { INSTRUCCIONES }
+  | function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10], linea: yylineno}); }
+
   //Funcion sin parametros y sin tipo -> function test() { INSTRUCCIONES }
   /*-->TR - EJ<--*/
   | function id par_izq par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7], linea: yylineno}); }
@@ -285,6 +289,9 @@ DECLARACION_FUNCION /*-->TR - EJ<--*/
   //Funcion con parametros y con tipo -> function test ( LISTA_PARAMETROS ) : TIPO { INSTRUCCIONES }
   /*-->TR - EJ<--*/
   | function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10], linea: yylineno}); }
+
+  //Funcion con parametros y con tipo -> function test ( LISTA_PARAMETROS ) : TIPO[][] { INSTRUCCIONES }
+  | function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'DECLARACION_FUNCION', hijos: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11], linea: yylineno}); }
 
   //Funcion con parametros y sin tipo -> function test ( LISTA_PARAMETROS ) { INSTRUCCIONES }
   /*-->TR - EJ<--*/
@@ -300,6 +307,7 @@ LISTA_PARAMETROS /*-->TR - EJ<--*/
 PARAMETRO /*-->TR - EJ<--*/
   : id dos_puntos TIPO_VARIABLE_NATIVA { $$ = new NodoAST({label: 'PARAMETRO', hijos: [$1, $2, $3], linea: yylineno}); }
   | id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES { $$ = new NodoAST({label: 'PARAMETRO', hijos: [$1, $2, $3, $4], linea: yylineno}); }
+  | id dos_puntos Array menor TIPO_VARIABLE_NATIVA mayor { $$ = new NodoAST({label: 'PARAMETRO', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
 ;
 
 DECLARACION_TYPE /*-->TR - EJ<--*/
