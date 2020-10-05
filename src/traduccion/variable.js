@@ -15,7 +15,7 @@ class Variable {
         return this.reasignable;
     }
     setIdNuevo(nuevo) {
-        this.idNuevo = nuevo;
+        //this.idNuevo = nuevo;
     }
     getIdNuevo() {
         return this.idNuevo != null && this.idNuevo.trim() !== '' ? this.idNuevo : this.id;

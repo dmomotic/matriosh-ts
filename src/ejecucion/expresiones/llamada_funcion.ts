@@ -69,7 +69,13 @@ export class LlamadaFuncion extends Instruccion {
     }
 
     entorno_local.variables = entorno_aux.variables;
-    entorno_local.padre = e.getEntornoGlobal();
+    //Si es una funcion anidada que estoy ejecutando y estoy dentro de una funcion
+    if(EntornoAux.getInstance().estoyEjecutandoFuncion() && this.id.endsWith('_')){
+      //No debo cambiar el entorno padre, lo dejo aqui por si acaso :D
+    }
+    else{
+      entorno_local.padre = e.getEntornoGlobal();
+    }
 
     EntornoAux.getInstance().inicioEjecucionFuncion();
 

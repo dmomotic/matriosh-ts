@@ -23,7 +23,7 @@ export class Variable {
   }
 
   setIdNuevo(nuevo: string): void {
-    this.idNuevo = nuevo;
+    //this.idNuevo = nuevo;
   }
 
   getIdNuevo(): string {

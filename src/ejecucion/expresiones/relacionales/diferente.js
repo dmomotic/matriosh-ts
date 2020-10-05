@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Diferente = void 0;
+const arreglo_1 = require("../../arreglo");
 const instruccion_1 = require("../../instruccion");
 class Diferente extends instruccion_1.Instruccion {
     constructor(linea, expIzq, expDer) {
@@ -10,18 +11,19 @@ class Diferente extends instruccion_1.Instruccion {
     ejecutar(e) {
         const exp1 = this.expIzq.ejecutar(e);
         const exp2 = this.expDer.ejecutar(e);
-        //Validacion de errores
-        // if(exp1 == null || exp2 == null){
-        //   Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion diferente que con un operador null`}));
-        //   return;
-        // }
+        //Validacion item por item solo si se esta comparando arreglos
+        if (exp1 instanceof arreglo_1.Arreglo && exp2 instanceof arreglo_1.Arreglo) {
+            //Si no tienen la misma cantidad de items no son iguales
+            if (exp1.getSize() != exp2.getSize())
+                return true;
+            //Si tienen la misma longitud realizo un recorrido para comparar los items - Esta implementacion funciona solo para los valores nativos
+            for (let i = 0; i < exp1.getSize(); i++) {
+                if (exp1.getValue(i) != exp2.getValue(i))
+                    return true;
+            }
+            return false;
+        }
         return exp1 != exp2;
-        //Solo se pueden realizar operacion mayor que con numbers y strings
-        // if((typeof exp1 == 'number' || typeof exp1 == 'string') && (typeof exp2 == 'number' || typeof exp2 == 'string')){
-        //   return exp1 > exp2;
-        // }
-        //Si no es error
-        // Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion mayor que entre un operando tipo ${typeof exp1} y un operando tipo ${typeof exp2}`}));
     }
 }
 exports.Diferente = Diferente;
