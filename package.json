@@ -15,6 +15,7 @@
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
     "gh-pages": "^3.1.0",
+    "js-beautify": "^1.13.0",
     "quasar": "^1.0.0",
     "viz.js": "^2.1.2",
     "vue-codemirror": "^4.0.6"

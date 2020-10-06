@@ -77,6 +77,8 @@
 </template>
 
 <script>
+//JS-Beautify
+var beautify_js = require('js-beautify').js_beautify
 // CodeMirror
 import { codemirror } from "vue-codemirror";
 // import base style
@@ -170,7 +172,8 @@ export default {
         this.dot = traduccion.getDot();
         const codigoNuevo = traduccion.traducir();
         Entornos.getInstance().clear();
-        this.code = codigoNuevo;
+        // this.code = codigoNuevo;
+        this.code = beautify_js(codigoNuevo, { indent_size: 2 });
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));

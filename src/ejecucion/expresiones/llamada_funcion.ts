@@ -8,6 +8,7 @@ import { getTipo } from "../tipo";
 import { Continue } from "../continue";
 import { Break } from "../break";
 import { EntornoAux } from "../entorno_aux";
+import { Arreglo } from "../arreglo";
 
 export class LlamadaFuncion extends Instruccion {
   id: string;
@@ -88,13 +89,14 @@ export class LlamadaFuncion extends Instruccion {
         //Validacion de retorno en funcion
         if (funcion.hasReturn() && resp.hasValue()) {
           //Valido el tipo del retorno
-          if(resp.getValue() != null && getTipo(resp.getValue()) != funcion.tipo_return){
+          let val = resp.getValue();
+          if(val != null && getTipo(val) != funcion.tipo_return){
             Errores.getInstance().push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `La funcion ${this.id} esta retornando un tipo distinto al declarado`}));
             EntornoAux.getInstance().finEjecucionFuncion();
             return;
           }
           EntornoAux.getInstance().finEjecucionFuncion();
-          return resp.getValue();
+          return val;
         }
         //Si la funcion tiene return pero el return no trae valor
         if (funcion.hasReturn() && !resp.hasValue()) {
